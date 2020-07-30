@@ -90,6 +90,25 @@ import org.springframework.util.MultiValueMap;
  * @see AnnotationUtils
  * @see BridgeMethodResolver
  */
+/**
+ * 查找注解、元注解的工具类，在{@link AnnotatedElement}上
+ * 支持注解属性重写，如果不需要使用注解属性重写，可以使用{@link AnnotationUtils}代替
+ * 注解属性重写，支持带有属性重写的元注解，组成的注解是由所有变体提供的
+ * {@code getMergedAnnotationAttributes()}, {@code getMergedAnnotation()},
+ * {@code getAllMergedAnnotations()}, {@code getMergedRepeatableAnnotations()},
+ * {@code findMergedAnnotationAttributes()}, {@code findMergedAnnotation()},
+ * {@code findAllMergedAnnotations()}, and {@code findMergedRepeatableAnnotations()}
+ * 
+ * Find语义要详细得多
+ * get语义加上对以下内容的支持
+ * 在接口上搜索，如果注释的元素是类
+ * 在超类上搜索，如果注释的元素是类
+ * 解析桥接方法，如果注释元素是一种方法
+ * 在接口中搜索方法，如果注释元素是方法
+ * 在超类中搜索方法，如果注释元素是方法
+ * 
+ * 支持@Inherited
+ */
 public abstract class AnnotatedElementUtils {
 
 	/**
@@ -98,6 +117,7 @@ public abstract class AnnotatedElementUtils {
 	 * @param annotations the annotations to expose through the {@code AnnotatedElement}
 	 * @since 4.3
 	 */
+  /** 为给的的注解构建一个适配的{@link AnnotatedElement} */
 	public static AnnotatedElement forAnnotations(Annotation... annotations) {
 		return new AnnotatedElementForAnnotations(annotations);
 	}
@@ -116,6 +136,7 @@ public abstract class AnnotatedElementUtils {
 	 * @see #getMetaAnnotationTypes(AnnotatedElement, String)
 	 * @see #hasMetaAnnotationTypes
 	 */
+  /** 获取指定注解上所有元注解类型的完全限定类名 */
 	public static Set<String> getMetaAnnotationTypes(AnnotatedElement element,
 			Class<? extends Annotation> annotationType) {
 
@@ -136,15 +157,20 @@ public abstract class AnnotatedElementUtils {
 	 * @see #getMetaAnnotationTypes(AnnotatedElement, Class)
 	 * @see #hasMetaAnnotationTypes
 	 */
+  /** 获取指定注解上所有元注解类型的完全限定类名 */
 	public static Set<String> getMetaAnnotationTypes(AnnotatedElement element, String annotationName) {
-		for (Annotation annotation : element.getAnnotations()) {
+    /* 遍历所有注解 */
+    for (Annotation annotation : element.getAnnotations()) {
+      /* 注解的名称是指定名称 */
 			if (annotation.annotationType().getName().equals(annotationName)) {
+        /* 获取注解上的元注解类型 */
 				return getMetaAnnotationTypes(element, annotation);
 			}
 		}
 		return Collections.emptySet();
 	}
 
+  /** 获取指定注解上的元注解类型 */
 	private static Set<String> getMetaAnnotationTypes(AnnotatedElement element, @Nullable Annotation annotation) {
 		if (annotation == null) {
 			return Collections.emptySet();
@@ -166,6 +192,7 @@ public abstract class AnnotatedElementUtils {
 	 * @since 4.2.3
 	 * @see #getMetaAnnotationTypes
 	 */
+  /** 注解元素是否带有指定元注解 */
 	public static boolean hasMetaAnnotationTypes(AnnotatedElement element, Class<? extends Annotation> annotationType) {
 		return getAnnotations(element).stream(annotationType).anyMatch(MergedAnnotation::isMetaPresent);
 	}

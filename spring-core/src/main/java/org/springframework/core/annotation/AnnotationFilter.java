@@ -31,6 +31,11 @@ import java.lang.annotation.Annotation;
  * @since 5.2
  * @see MergedAnnotations
  */
+/**
+ * 注解过滤器，用于筛选注解类型，函数式接口
+ * 注意：{@link MergedAnnotations}模型总是会忽略java.lang包下的注解，由于效率原因
+ * 任何额外的过滤器，甚至自定义过滤器，只会从这个范围进一步缩小
+ */
 @FunctionalInterface
 public interface AnnotationFilter {
 
@@ -40,18 +45,23 @@ public interface AnnotationFilter {
 	 * and their subpackages.
 	 * <p>This is the default filter in the {@link MergedAnnotations} model.
 	 */
+  /** PLAIN过滤器，匹配java.lang和org.springframework.lang与它们的子包
+   * 这是{@link MergedAnnotations}中的默认过滤器
+   */
 	AnnotationFilter PLAIN = packages("java.lang", "org.springframework.lang");
 
 	/**
 	 * {@link AnnotationFilter} that matches annotations in the
 	 * {@code java} and {@code javax} packages and their subpackages.
 	 */
+  /** 匹配java、javax和它们的子包 */
 	AnnotationFilter JAVA = packages("java", "javax");
 
 	/**
 	 * {@link AnnotationFilter} that always matches and can be used when no
 	 * relevant annotation types are expected to be present at all.
 	 */
+  /** 匹配所有 */
 	AnnotationFilter ALL = new AnnotationFilter() {
 		@Override
 		public boolean matches(Annotation annotation) {
@@ -79,6 +89,7 @@ public interface AnnotationFilter {
 	 * (for efficiency reasons)
 	 * @see #PLAIN
 	 */
+  /** 不匹配任何注解 */
 	@Deprecated
 	AnnotationFilter NONE = new AnnotationFilter() {
 		@Override
@@ -105,6 +116,7 @@ public interface AnnotationFilter {
 	 * @param annotation the annotation to test
 	 * @return {@code true} if the annotation matches
 	 */
+  /** 注解是否与过滤器匹配 */
 	default boolean matches(Annotation annotation) {
 		return matches(annotation.annotationType());
 	}
@@ -114,6 +126,7 @@ public interface AnnotationFilter {
 	 * @param type the annotation type to test
 	 * @return {@code true} if the annotation matches
 	 */
+  /** 给定类型是否与过滤器匹配 */
 	default boolean matches(Class<?> type) {
 		return matches(type.getName());
 	}
@@ -123,6 +136,7 @@ public interface AnnotationFilter {
 	 * @param typeName the fully qualified class name of the annotation type to test
 	 * @return {@code true} if the annotation matches
 	 */
+  /** 指定类型是否与过滤器匹配 */
 	boolean matches(String typeName);
 
 
@@ -132,6 +146,7 @@ public interface AnnotationFilter {
 	 * @param packages the annotation packages that should match
 	 * @return a new {@link AnnotationFilter} instance
 	 */
+  /** 创建一个注解过滤器，匹配指定包名 */
 	static AnnotationFilter packages(String... packages) {
 		return new PackagesAnnotationFilter(packages);
 	}

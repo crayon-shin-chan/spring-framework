@@ -33,6 +33,10 @@ import org.springframework.util.Assert;
  * @since 5.2
  * @param <A> the annotation type
  */
+/**
+ * {@link MergedAnnotation}实现的抽象基类
+ * @param <A>
+ */
 abstract class AbstractMergedAnnotation<A extends Annotation> implements MergedAnnotation<A> {
 
 	@Nullable
