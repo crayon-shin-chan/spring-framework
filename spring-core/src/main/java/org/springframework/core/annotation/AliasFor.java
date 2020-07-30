@@ -175,6 +175,64 @@ import java.lang.annotation.Target;
  * @see MergedAnnotations
  * @see SynthesizedAnnotation
  */
+/**
+ * {@code @Alias For}是用于声明注解属性别名的注解
+ * 
+ * 使用要求
+ * 仅仅存在{@code@AliasFor}本身不会强制执行别名语义
+ * 注解必须要通过{@link MergedAnnotations}加载，别名语义才会强制执行
+ * 
+ * 组成别名对的每个属性都应该被注释
+ * 别名属性必须声明相同的返回类型。
+ * 别名属性必须声明默认值。
+ * 别名属性必须声明相同的默认值。
+ * 
+ * 显式别名，value和localtions互为别名
+ * public @interface ContextConfiguration {
+ *
+ *    @AliasFor("locations")
+ *    String[] value() default {};
+ *
+ *    @AliasFor("value")
+ *    String[] locations() default {};
+ *
+ * }
+ * 
+ * 元注解属性的显式别名，xmlFiles覆盖了元注解上locations这个属性
+ * @ContextConfiguration
+ * public @interface XmlTestConfig {
+ *
+ *    @AliasFor(annotation = ContextConfiguration.class, attribute = "locations")
+ *    String[] xmlFiles();
+ * }
+ * 
+ * 隐式别名，value、groovyScripts、xmlFiles都覆盖了元注解属性locations
+ * 它们三个互为别名
+ * @ContextConfiguration
+ * public @interface MyTestConfig {
+ *
+ *    @AliasFor(annotation = ContextConfiguration.class, attribute = "locations")
+ *    String[] value() default {};
+ *
+ *    @AliasFor(annotation = ContextConfiguration.class, attribute = "locations")
+ *    String[] groovyScripts() default {};
+ *
+ *    @AliasFor(annotation = ContextConfiguration.class, attribute = "locations")
+ *    String[] xmlFiles() default {};
+ * }
+ * 
+ * 传递隐式别名
+ * @MyTestConfig
+ * public @interface GroovyOrXmlTestConfig {
+ *
+ *    @AliasFor(annotation = MyTestConfig.class, attribute = "groovyScripts")
+ *    String[] groovy() default {};
+ *
+ *    @AliasFor(annotation = ContextConfiguration.class, attribute = "locations")
+ *    String[] xml() default {};
+ * }
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @Documented
@@ -186,6 +244,10 @@ public @interface AliasFor {
 	 * is not declared &mdash; for example: {@code @AliasFor("value")} instead of
 	 * {@code @AliasFor(attribute = "value")}.
 	 */
+  /**
+   * attribute的别名
+   * @return
+   */
 	@AliasFor("attribute")
 	String value() default "";
 
@@ -193,6 +255,10 @@ public @interface AliasFor {
 	 * The name of the attribute that <em>this</em> attribute is an alias for.
 	 * @see #value
 	 */
+  /**
+   * 别名属性名称
+   * @return
+   */
 	@AliasFor("value")
 	String attribute() default "";
 
@@ -201,6 +267,10 @@ public @interface AliasFor {
 	 * <p>Defaults to {@link Annotation}, implying that the aliased attribute is
 	 * declared in the same annotation as <em>this</em> attribute.
 	 */
+  /**
+   * 声明别名属性的注解类型，如果为空，则代表与被注解的属性在相同的注解中
+   * @return
+   */
 	Class<? extends Annotation> annotation() default Annotation.class;
 
 }

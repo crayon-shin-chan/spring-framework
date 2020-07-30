@@ -35,6 +35,9 @@ package org.springframework.asm;
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
+/**
+ * Java注解访问器，类方法必须按照以下顺序调用
+ */
 public abstract class AnnotationVisitor {
 
   /**
