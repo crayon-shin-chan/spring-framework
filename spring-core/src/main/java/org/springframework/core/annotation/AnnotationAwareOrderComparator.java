@@ -44,11 +44,16 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.core.annotation.Order
  * @see javax.annotation.Priority
  */
+/** {@code AnnotationAwareOrderComparator}是{@link OrderComparator}的扩展
+ * 支持{@link Ordered}接口与{@link Order @Order}、{@link javax.annotation.Priority @Priority}注解
+ * 具有{@code Ordered}提供的order值可以重写静态定义的注解值
+ */
 public class AnnotationAwareOrderComparator extends OrderComparator {
 
 	/**
 	 * Shared default instance of {@code AnnotationAwareOrderComparator}.
 	 */
+  /** 共享实例 */
 	public static final AnnotationAwareOrderComparator INSTANCE = new AnnotationAwareOrderComparator();
 
 
@@ -58,6 +63,10 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	 * elements, in addition to the {@link org.springframework.core.Ordered}
 	 * check in the superclass.
 	 */
+  /** 
+   * 如果没有{@link Ordered}接口
+   * 此实现检查{@link Order@Order}、{@link javax.annotation.Priority@Priority}注解
+   */
 	@Override
 	@Nullable
 	protected Integer findOrder(Object obj) {
@@ -68,11 +77,14 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 		return findOrderFromAnnotation(obj);
 	}
 
+  /** 在注解上查找order值 */
 	@Nullable
 	private Integer findOrderFromAnnotation(Object obj) {
 		AnnotatedElement element = (obj instanceof AnnotatedElement ? (AnnotatedElement) obj : obj.getClass());
-		MergedAnnotations annotations = MergedAnnotations.from(element, SearchStrategy.TYPE_HIERARCHY);
-		Integer order = OrderUtils.getOrderFromAnnotations(element, annotations);
+    MergedAnnotations annotations = MergedAnnotations.from(element, SearchStrategy.TYPE_HIERARCHY);
+    /** 先使用order工具查找 */
+    Integer order = OrderUtils.getOrderFromAnnotations(element, annotations);
+    /** 装饰代理，从注解上查找 */
 		if (order == null && obj instanceof DecoratingProxy) {
 			return findOrderFromAnnotation(((DecoratingProxy) obj).getDecoratedClass());
 		}
@@ -85,6 +97,10 @@ public class AnnotationAwareOrderComparator extends OrderComparator {
 	 * annotation: typically, selecting one object over another in case of
 	 * multiple matches but only one object to be returned.
 	 */
+  /**
+   * 获取优先级，此实现查找{@link javax.annotation.Priority}注解值
+   * 允许常规的{@link Order}上的附加语义
+   */
 	@Override
 	@Nullable
 	public Integer getPriority(Object obj) {

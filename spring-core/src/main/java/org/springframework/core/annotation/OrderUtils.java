@@ -33,14 +33,20 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  * @see Order
  * @see javax.annotation.Priority
  */
+/** 用于根据对象类型声明确定对象顺序的工具类
+ * 处理Spring的{@link Order}注解以及{@link javax.annotation.Priority}
+ * 
+ */
 public abstract class OrderUtils {
 
-	/** Cache marker for a non-annotated Class. */
+  /** Cache marker for a non-annotated Class. */
+  /** 缓存标记一个非注解类 */
 	private static final Object NOT_ANNOTATED = new Object();
 
 	private static final String JAVAX_PRIORITY_ANNOTATION = "javax.annotation.Priority";
 
-	/** Cache for @Order value (or NOT_ANNOTATED marker) per Class. */
+  /** Cache for @Order value (or NOT_ANNOTATED marker) per Class. */
+  /** 缓存每个类的@Order值 */
 	private static final Map<AnnotatedElement, Object> orderCache = new ConcurrentReferenceHashMap<>(64);
 
 

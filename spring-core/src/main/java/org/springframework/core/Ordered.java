@@ -40,18 +40,25 @@ package org.springframework.core;
  * @see org.springframework.core.annotation.Order
  * @see org.springframework.core.annotation.AnnotationAwareOrderComparator
  */
+/**
+ * {@code Ordered}是一个可以由对象实现的接口，代表此对象是可排序的，例如在{@code Collection}中
+ * {@link #getOrder() order}可以解释为优先级，第一个对象有最低的order值，有最高优先级
+ * 注意，此接口还有一个优先标记{@link PriorityOrdered}
+ */
 public interface Ordered {
 
 	/**
 	 * Useful constant for the highest precedence value.
 	 * @see java.lang.Integer#MIN_VALUE
 	 */
+  /** 最高优先级常数，最小整数 */
 	int HIGHEST_PRECEDENCE = Integer.MIN_VALUE;
 
 	/**
 	 * Useful constant for the lowest precedence value.
 	 * @see java.lang.Integer#MAX_VALUE
 	 */
+  /** 最低优先级常数，最大整数 */
 	int LOWEST_PRECEDENCE = Integer.MAX_VALUE;
 
 
@@ -66,6 +73,10 @@ public interface Ordered {
 	 * @see #HIGHEST_PRECEDENCE
 	 * @see #LOWEST_PRECEDENCE
 	 */
+  /** 获取此对象的排序值
+   * 较高的值被解释为较低的优先级，具有最低值的对象具有Uzi高优先级
+   * 相同的顺序值将导致任意排序位置
+   */
 	int getOrder();
 
 }

@@ -60,6 +60,20 @@ import org.springframework.core.Ordered;
  * @see OrderUtils
  * @see javax.annotation.Priority
  */
+/**
+ * {@code @Order}定义注解组件的排序顺序。
+ * {@link #value}是可选的，并表示其中定义的订单值
+ * {@link Ordered}接口，较低的值具有更高的优先级，默认值为{@code Ordered.LOWEST_PRECEDENCE}，表示最低优先级
+ * 
+ * 自Spring4.0依赖，基于注解的排序支持很多Spring中的组件，虽然这种order值可能在注入点影响优先事项
+ * 但是它们不影响单例启动顺序，启动顺序是由依赖关系决定的正交交往{@code @DependsOn} 声明
+ * 
+ * 从Spring4.1开始，标准的{@link javax.annotation.Priority}注释在排序场景中，可以用作此注释的替换。
+ * {@code @Priority}在单个元素时可能有额外的语义
+ * 
+ * order值也可以通过{@link Ordered}接口根据每个实例确定，允许每个实例配置确定order值，而不是附加到指定类的硬编码值
+ * 
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Documented
@@ -70,6 +84,7 @@ public @interface Order {
 	 * <p>Default is {@link Ordered#LOWEST_PRECEDENCE}.
 	 * @see Ordered#getOrder()
 	 */
+  /** order值 */
 	int value() default Ordered.LOWEST_PRECEDENCE;
 
 }
