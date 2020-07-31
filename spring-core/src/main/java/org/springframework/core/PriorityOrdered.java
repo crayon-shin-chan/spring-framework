@@ -44,5 +44,18 @@ package org.springframework.core;
  * @see org.springframework.beans.factory.config.PropertyOverrideConfigurer
  * @see org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
  */
+/**
+ * 扩展{@link Ordered}接口，表示优先排序
+ * {@code PriorityOrdered}对象总是在普通{@link Ordered}对象前面应用，而不考虑它们的order值
+ * 在对一组{@code Ordered}对象排序时，{@code PriorityOrdered}对象和普通{@code Ordered}对象被有效地视为两个单独的子集
+ * 在每个子集中进行相对排序
+ * 
+ * 这是一个特殊用途的接口，在框架内使用对于识别特别重要的优先对象
+ * 一个典型的例子是{@link org.springframework.context.ApplicationContext}中的后处理器的优先级
+ * 注意：{@code PriorityOrdered}后处理器bean在一个特殊阶段被初始化，领先于其他后处理器。 
+ * 很微妙的影响了他们的自动注入autowiring行为
+ * 他们只会被不需要对类型匹配进行急切初始化的bean自动注入。
+ * 
+ */
 public interface PriorityOrdered extends Ordered {
 }

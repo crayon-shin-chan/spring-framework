@@ -33,27 +33,38 @@ import org.springframework.cglib.core.internal.LoadingCache;
  * customizing the <code>ClassLoader</code>, name of the generated class, and transformations
  * applied before generation.
  */
+/** CGLIB抽象类生成器
+ * 除了为性能缓存生成类之外，它还提供了钩子来定制化ClassLoader、生成类名和在生成之前应用转换
+ * 
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 
+  /** 当前线程的类生成器 */
 	private static final ThreadLocal CURRENT = new ThreadLocal();
 
+  /** 类加载器弱引用 */
 	private static volatile Map<ClassLoader, ClassLoaderData> CACHE = new WeakHashMap<ClassLoader, ClassLoaderData>();
 
-	private static final boolean DEFAULT_USE_CACHE =
-			Boolean.parseBoolean(System.getProperty("cglib.useCache", "true"));
+  /** 是否使用缓存 */
+	private static final boolean DEFAULT_USE_CACHE = Boolean.parseBoolean(System.getProperty("cglib.useCache", "true"));
 
-
+  /** 生成策略 */
 	private GeneratorStrategy strategy = DefaultGeneratorStrategy.INSTANCE;
 
+  /** 命名策略 */
 	private NamingPolicy namingPolicy = DefaultNamingPolicy.INSTANCE;
 
+  /** 源，增强器类名 */
 	private Source source;
 
+  /** 类加载器 */
 	private ClassLoader classLoader;
 
+  /** 当前上下文类 */
 	private Class contextClass;
 
+  /** 名称前缀 */
 	private String namePrefix;
 
 	private Object key;
@@ -64,9 +75,10 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 
 	private boolean attemptLoad;
 
-
+  /** 类加载器数据 */
 	protected static class ClassLoaderData {
 
+    /** 保留类名 */
 		private final Set<String> reservedClassNames = new HashSet<String>();
 
 		/**
@@ -146,7 +158,7 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 		return ((WeakReference) cached).get();
 	}
 
-
+  /** 增强器的类名源 */
 	protected static class Source {
 
 		String name;
@@ -173,6 +185,7 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 		this.className = className;
 	}
 
+  /** 生成类名 */
 	private String generateClassName(Predicate nameTestPredicate) {
 		return namingPolicy.getClassName(namePrefix, source.name, key, nameTestPredicate);
 	}
@@ -263,6 +276,7 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 	 * Used internally by CGLIB. Returns the <code>AbstractClassGenerator</code>
 	 * that is being used to generate a class in the current thread.
 	 */
+  /** CGLIB内部使用，返回抽象类生成器，用于在当前线程中生成类 */
 	public static AbstractClassGenerator getCurrent() {
 		return (AbstractClassGenerator) CURRENT.get();
 	}
@@ -330,6 +344,7 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 		}
 	}
 
+  /** 生成类 */
 	protected Class generate(ClassLoaderData data) {
 		Class gen;
 		Object save = CURRENT.get();
@@ -342,10 +357,12 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 						"Please file an issue at cglib's issue tracker.");
 			}
 			synchronized (classLoader) {
+        /** 生成类名 */
 				String name = generateClassName(data.getUniqueNamePredicate());
 				data.reserveName(name);
 				this.setClassName(name);
-			}
+      }
+      /** 尝试使用类加载器加载 */
 			if (attemptLoad) {
 				try {
 					gen = classLoader.loadClass(getClassName());
@@ -354,8 +371,10 @@ abstract public class AbstractClassGenerator<T> implements ClassGenerator {
 				catch (ClassNotFoundException e) {
 					// ignore
 				}
-			}
-			byte[] b = strategy.generate(this);
+      }
+      /** 生成策略生成类字节 */
+      byte[] b = strategy.generate(this);
+      /** 获取生成类名 */
 			String className = ClassNameReader.getClassName(new ClassReader(b));
 			ProtectionDomain protectionDomain = getProtectionDomain();
 			synchronized (classLoader) { // just in case

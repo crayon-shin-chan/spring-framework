@@ -89,15 +89,38 @@ import org.springframework.cglib.core.WeakCacheKey;
  * For an almost drop-in replacement for
  * <code>java.lang.reflect.Proxy</code>, see the {@link Proxy} class.
  */
+/**
+ * 生成动态子类，启用方法拦截。这个类以替代标准的动态代理支持的形式包含在JDK1.3中
+ * 但与动态代理不同，除了实现接口之外它允许代理扩展具体的基类
+ * 动态生成的子类覆盖了超类的非final方法，而且具有用户定义拦截器的回调钩子方法
+ * 
+ * 最一般的回调类型是{@link MethodInterceptor}，在AOP术语中术语环绕通知
+ * 也就是说，你可以在调用super方法之前和之后调用自定义代码
+ * 另外可以在调用super方法之前修改参数，或者根本不调用它
+ * 
+ * 虽然Method Interceptor是通用的，足以满足任何要求
+ * 拦截需要，但他经常是过度杀伤。
+ * 为了简单和性能，附加专门的回调类型，如@link LazyLoader}也是可用的
+ * 通常每个增强类都会使用一个回调，但您可以控制在每种方法的基础上使用{@link CallbackFilter}
+ * 
+ * 这个类最常见的用法体现在静态帮助方法中。为了特殊的需求，例如定制类装载器
+ * 您应该创建Enhancer的一个新势力。CGLIB中的其他类遵循类似的模式
+ * 
+ * 所有增强的对象都实现{@link Factory}接口，除非{@link #setUseFactory}方法用来显式禁用此特性
+ * 工厂接口提供了一个API用于更改现有对象的回调，以及更快、更容易的创建相同类型新实例的方法
+ * 
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Enhancer extends AbstractClassGenerator {
 
-	private static final CallbackFilter ALL_ZERO = new CallbackFilter() {
+  /** 回调过滤器，所有都不接受 */
+  private static final CallbackFilter ALL_ZERO = new CallbackFilter() {
 		public int accept(Method method) {
 			return 0;
 		}
 	};
 
+  /** 类生成器的源 */
 	private static final Source SOURCE = new Source(Enhancer.class.getName());
 
 	private static final EnhancerKey KEY_FACTORY =
@@ -192,6 +215,7 @@ public class Enhancer extends AbstractClassGenerator {
 	private static final Signature BIND_CALLBACKS =
 			TypeUtils.parseSignature("void CGLIB$BIND_CALLBACKS(Object)");
 
+  /** 增强器工厂数据 */    
 	private EnhancerFactoryData currentData;
 
 	private Object currentKey;
@@ -200,6 +224,7 @@ public class Enhancer extends AbstractClassGenerator {
 	/**
 	 * Internal interface, only public due to ClassLoader issues.
 	 */
+  /** 内部接口，增强器键 */
 	public interface EnhancerKey {
 
 		public Object newInstance(String type,

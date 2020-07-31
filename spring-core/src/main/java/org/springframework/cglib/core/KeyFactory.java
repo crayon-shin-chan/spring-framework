@@ -54,6 +54,22 @@ import org.springframework.cglib.core.internal.CustomizerRegistry;
  * <code>key1.equals(key2)</code> <i>and</i> the keys were produced by the same factory.
  * @version $Id: KeyFactory.java,v 1.26 2006/03/05 02:43:19 herbyderby Exp $
  */
+/**
+ * 生成类用于处理诸如Maps、Sets之类多值key，equals和hashCode遵循xxx规则
+ * 要生成{@link KeyFactory}，必须提供一个接口描述Key的结构
+ * 接口要有返回Object名为newInstance的方法，以任何东西-对象、原始值、一维或者多维数组为参数
+ * 例如：
+ * private interface IntStringKey {
+ *     public Object newInstance(int i, String s);
+ * }
+ * 一旦你创建了KeyFactory，你将通过调用newInstance生成一个新的Key
+ * 例如：
+ * IntStringKey factory = (IntStringKey)KeyFactory.create(IntStringKey.class);
+ * Object key1 = factory.newInstance(4, "Hello");
+ * Object key2 = factory.newInstance(4, "World");
+ * 注意：
+ * 只有key1、key2是同一家工厂生产的，hashCode相等才能保证equals相等
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 abstract public class KeyFactory {
 
