@@ -38,6 +38,7 @@ import org.springframework.util.MimeType;
  * @since 5.0
  * @param <T> the type of elements in the input stream
  */
+/** 编码器接口，将{@code T}类型的对象流编码成输出的字节流 */
 public interface Encoder<T> {
 
 	/**

@@ -80,6 +80,32 @@ import org.springframework.util.StringUtils;
  * @see #forInstance(Object)
  * @see ResolvableTypeProvider
  */
+/**
+ * 封装Java{@link java.lang.reflect.Type}，提供访问以下权限：
+ * {@link #getSuperType() supertypes}, 父类类型
+ * {@link #getInterfaces() interfaces}, 接口类型
+ * {@link #getGeneric(int...) generic parameters}，泛型类型
+ * 
+ * {@code ResolvableTypes}可以从以下方法获取：
+ * {@link #forField(Field) fields}，字段类型
+ * {@link #forMethodParameter(Method, int) method parameters}，方法参数类型
+ * {@link #forMethodReturnType(Method) method returns} ，方法返回值类型
+ * {@link #forClass(Class) classes}，指定类型
+ * 这个类上大多数方法都会返回{@link ResolvableType ResolvableTypes}，允许轻松导航
+ * 例如：
+ * 
+ * private HashMap<Integer, List<String>> myMap;
+ * 
+ * public void example() {
+ *     ResolvableType t = ResolvableType.forField(getClass().getDeclaredField("myMap"));//获取字段类型
+ *     t.getSuperType(); // AbstractMap<Integer, List<String>> 父类性
+ *     t.asMap(); // Map<Integer, List<String>>
+ *     t.getGeneric(0).resolve(); // Integer，获取第一个泛型类型
+ *     t.getGeneric(1).resolve(); // List，获取第二个泛型类型，解析后不存在下一级泛型
+ *     t.getGeneric(1); // List<String>;
+ *     t.resolveGeneric(1, 0); // 获取第二个泛型的第一个子泛型
+ * }
+ */
 @SuppressWarnings("serial")
 public class ResolvableType implements Serializable {
 
@@ -91,6 +117,7 @@ public class ResolvableType implements Serializable {
 
 	private static final ResolvableType[] EMPTY_TYPES_ARRAY = new ResolvableType[0];
 
+  /** 缓存 */
 	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache =
 			new ConcurrentReferenceHashMap<>(256);
 
@@ -98,23 +125,27 @@ public class ResolvableType implements Serializable {
 	/**
 	 * The underlying Java type being managed.
 	 */
+  /** 管理的Java类型 */
 	private final Type type;
 
 	/**
 	 * Optional provider for the type.
 	 */
+  /** 类型供应商 */
 	@Nullable
 	private final TypeProvider typeProvider;
 
 	/**
 	 * The {@code VariableResolver} to use or {@code null} if no resolver is available.
 	 */
+  /** 变量解析器 */
 	@Nullable
 	private final VariableResolver variableResolver;
 
 	/**
 	 * The component type for an array or {@code null} if the type should be deduced.
 	 */
+  /** 数组组件类型 */
 	@Nullable
 	private final ResolvableType componentType;
 
@@ -124,12 +155,15 @@ public class ResolvableType implements Serializable {
 	@Nullable
 	private Class<?> resolved;
 
+  /** 父类型 */
 	@Nullable
 	private volatile ResolvableType superType;
 
+  /** 接口类型 */
 	@Nullable
 	private volatile ResolvableType[] interfaces;
 
+  /** 泛型类型 */
 	@Nullable
 	private volatile ResolvableType[] generics;
 
