@@ -43,16 +43,22 @@ import org.springframework.util.StringUtils;
  * @see AnnotationUtils#getAnnotationAttributes
  * @see AnnotatedElementUtils
  */
+/**
+ * 表示注解属性的{@linkLinkLinkHashMap}子类
+ * {@link AnnotationUtils}，{@link AnnotatedElementUtils},{@link AnnotationMetadata}读取的键值对
+ * 提供'伪校正'以避免调用中的噪声映射泛型
+ */
 @SuppressWarnings("serial")
 public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 
 	private static final String UNKNOWN = "unknown";
 
+  /** 注解类型 */
 	@Nullable
 	private final Class<? extends Annotation> annotationType;
 
 	final String displayName;
-
+  /** 是否已验证 */
 	boolean validated = false;
 
 
@@ -144,6 +150,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 		this.displayName = annotationType;
 	}
 
+  /** 加载指定注解类 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	private static Class<? extends Annotation> getAnnotationType(String annotationType, @Nullable ClassLoader classLoader) {
@@ -177,6 +184,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @throws IllegalArgumentException if the attribute does not exist or
 	 * if it is not of the expected type
 	 */
+  /** 获取指定字符串属性值，不存在或者类型不符合，抛出异常 */
 	public String getString(String attributeName) {
 		return getRequiredAttribute(attributeName, String.class);
 	}
@@ -193,6 +201,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @throws IllegalArgumentException if the attribute does not exist or
 	 * if it is not of the expected type
 	 */
+  /** 获取指定字符串数组属性值，如果存储的值是一个字符串，将被包裹在一个单元素数组返回 */
 	public String[] getStringArray(String attributeName) {
 		return getRequiredAttribute(attributeName, String[].class);
 	}
@@ -274,6 +283,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @throws IllegalArgumentException if the attribute does not exist or
 	 * if it is not of the expected type
 	 */
+  /** 获取指定属性下的注解属性 */
 	public AnnotationAttributes getAnnotation(String attributeName) {
 		return getRequiredAttribute(attributeName, AnnotationAttributes.class);
 	}
@@ -289,6 +299,7 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * if it is not of the expected type
 	 * @since 4.2
 	 */
+  /** 获取指定属性下的注解对象 */
 	public <A extends Annotation> A getAnnotation(String attributeName, Class<A> annotationType) {
 		return getRequiredAttribute(attributeName, annotationType);
 	}
@@ -346,12 +357,20 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
 	 * @throws IllegalArgumentException if the attribute does not exist or
 	 * if it is not of the expected type
 	 */
+  /**
+   * 获取指定属性名下的值，确保值是期望类型，如果期望类型是数组而且存储的值是单个数组元素类型，单个元素将被包裹在数组中返回
+   * @param <T>：返回泛型
+   * @param attributeName：属性名
+   * @param expectedType：期望属性类型
+   * @return
+   */
 	@SuppressWarnings("unchecked")
 	private <T> T getRequiredAttribute(String attributeName, Class<T> expectedType) {
 		Assert.hasText(attributeName, "'attributeName' must not be null or empty");
 		Object value = get(attributeName);
 		assertAttributePresence(attributeName, value);
-		assertNotException(attributeName, value);
+    assertNotException(attributeName, value);
+    /** 如果期望类型是数组类型，而存储值是数组元素类型，返回保证单元素数组 */
 		if (!expectedType.isInstance(value) && expectedType.isArray() &&
 				expectedType.getComponentType().isInstance(value)) {
 			Object array = Array.newInstance(expectedType.getComponentType(), 1);

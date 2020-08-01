@@ -59,11 +59,27 @@ import org.springframework.lang.Nullable;
  * @see MergedAnnotations
  * @see MergedAnnotationPredicates
  */
+/**
+ * 从{@link MergedAnnotations}集合返回的单个合并注解
+ * 以视图呈现已从不同的源值合并的属性值在注解上
+ * 
+ * 可以使用各种{@code get}方法访问属性值
+ * 例如，要访问{@code int}属性，将使用{@link #getInt(String)}方法
+ * 
+ * 注意，访问时不转换属性值
+ * 例如，如果底层属性是{@code int}，不可能调用{@link #getString(String)}
+ * 这个规则唯一的例外是{@code Class}值和{@code Class[]}值
+ * 这些纸可以作为{@code String}和{@code String[]}返回以防止潜在的早期类初始化
+ * 
+ * 如果有必要，一个{@code MergedAnnotation}可以{@linkplain #synthesize() synthesized}回一个注解对象
+ * @param <A>
+ */
 public interface MergedAnnotation<A extends Annotation> {
 
 	/**
 	 * The attribute name for annotations with a single element.
 	 */
+  /** 单元素注解属性名称 */
 	String VALUE = "value";
 
 
@@ -71,6 +87,7 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * Get the {@code Class} reference for the actual annotation type.
 	 * @return the annotation type
 	 */
+  /** 获取注解类型 */
 	Class<A> getType();
 
 	/**
@@ -80,6 +97,12 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * of the {@link SearchStrategy} used.
 	 * @return {@code true} if the annotation is present
 	 */
+  /**
+   * 确定注解是否存在于源上，考虑
+   * {@linkplain #isDirectlyPresent() directly present}直接存在和
+   * {@linkplain #isMetaPresent() meta-present}注解存在于{@link SearchStrategy}使用的上下文
+   * @return
+   */
 	boolean isPresent();
 
 	/**
@@ -89,6 +112,10 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * or {@link Inherited @Inherited}.
 	 * @return {@code true} if the annotation is directly present
 	 */
+  /** 注解是否直接出现在源上
+   * 直接呈现的注解是一个用户显式声明的而且不是一个{@linkplain #isMetaPresent() meta-present}或者{@link Inherited @Inherited}
+   * 如果注解直接存在，返回{@code true}
+   */
 	boolean isDirectlyPresent();
 
 	/**
@@ -98,6 +125,11 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * the annotation hierarchy.
 	 * @return {@code true} if the annotation is meta-present
 	 */
+  /**
+   * 确定注解是否在源上是元呈现的
+   * 一个元呈现注解是一个用户没有显式声明的注解，但是在注解继承链的某个地方作为元注解使用
+   * @return
+   */
 	boolean isMetaPresent();
 
 	/**
@@ -109,6 +141,11 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * missing} annotation will always return a distance of {@code -1}.
 	 * @return the annotation distance or {@code -1} if the annotation is missing
 	 */
+  /** 获取其作为元注解的距离
+   * 直接声明的注解的距离为0
+   * 一个元注解距离为1，一个元注解在一个元注解上距离为2
+   * 一个{@linkplain #missing() missing}注解始终返回距离-1
+   */
 	int getDistance();
 
 	/**
@@ -120,6 +157,12 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * @return the aggregate index (starting at {@code 0}) or {@code -1} if the
 	 * annotation is missing
 	 */
+  /**
+   * 获取包含此注解的聚合集合的索引
+   * 可以用来重新排序注解流，例如，给一个声明在父类或者接口上的注更高优先级
+   * 一个{@linkplain #missing() missing}注解总是返回聚合索引-1
+   * @return
+   */
 	int getAggregateIndex();
 
 	/**
@@ -134,6 +177,12 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * {@link #getRoot() root}.
 	 * @return the source, or {@code null}
 	 */
+  /** 获取最终声明根注解的源，或者源是未知时返回null
+   * 如果这个合并注解被{@link MergedAnnotations#from(AnnotatedElement) from}创建，那这个源也是相同类型元素
+   * 如果注解没有通过使用反射加载，源可以是任何类型，但是应该有一个合理的{@code toString()}方法
+   * 源注解总是返回与{@link #getRoot() root}相同的对象
+   * 
+   */
 	@Nullable
 	Object getSource();
 
@@ -145,6 +194,9 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * @return the meta-annotation source or {@code null}
 	 * @see #getRoot()
 	 */
+  /** 获取源注解的源，如果注解不是{@linkplain #isMetaPresent() meta-present}元呈现的，则返回null
+   * 源是这个注解所在的注解
+   */
 	@Nullable
 	MergedAnnotation<?> getMetaSource();
 
@@ -154,6 +206,9 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * @return the root annotation
 	 * @see #getMetaSource()
 	 */
+  /** 获取根注解，例如：{@link #getDistance() distance}返回0
+   * 注解直接声明在源上
+   */
 	MergedAnnotation<?> getRoot();
 
 	/**
@@ -165,6 +220,12 @@ public interface MergedAnnotation<A extends Annotation> {
 	 * @see #getRoot()
 	 * @see #getMetaSource()
 	 */
+  /**
+   * 获取注解层次结构中注解类型的完整列表
+   * 从此注解到{@link #getRoot() root}
+   * 提供了一种唯一标识合并注解实例的方法
+   * @return
+   */
 	List<Class<? extends Annotation>> getMetaTypes();
 
 
