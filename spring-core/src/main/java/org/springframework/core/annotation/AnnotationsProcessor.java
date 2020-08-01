@@ -30,6 +30,10 @@ import org.springframework.lang.Nullable;
  * @see AnnotationsScanner
  * @see TypeMappedAnnotations
  */
+/** 处理注解的回调接口
+ * C：上下文类型
+ * R：结果类型
+ */
 @FunctionalInterface
 interface AnnotationsProcessor<C, R> {
 
@@ -40,6 +44,7 @@ interface AnnotationsProcessor<C, R> {
 	 * @param aggregateIndex the aggregate index about to be processed
 	 * @return a {@code non-null} result if no further processing is required
 	 */
+  /** 当聚合即将被处理时调用，这个方法可以返回一个非null结果来短路任何未来的处理 */
 	@Nullable
 	default R doWithAggregate(C context, int aggregateIndex) {
 		return null;
@@ -55,6 +60,9 @@ interface AnnotationsProcessor<C, R> {
 	 * {@code null} elements)
 	 * @return a {@code non-null} result if no further processing is required
 	 */
+  /**
+   * 当一个注解数组可以被处理时调用，方法可以返回非空结果以短路任何进一步的处理
+   */
 	@Nullable
 	R doWithAnnotations(C context, int aggregateIndex, @Nullable Object source, Annotation[] annotations);
 
@@ -64,6 +72,7 @@ interface AnnotationsProcessor<C, R> {
 	 * @param result the last early exit result, or {@code null} if none
 	 * @return the final result to be returned to the caller
 	 */
+  /** 得到最终返回结果。默认情况下，此方法返回最后一个过程结果 */
 	@Nullable
 	default R finish(@Nullable R result) {
 		return result;

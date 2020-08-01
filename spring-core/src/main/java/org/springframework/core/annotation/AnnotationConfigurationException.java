@@ -27,6 +27,9 @@ import org.springframework.core.NestedRuntimeException;
  * @see AnnotationUtils
  * @see SynthesizedAnnotation
  */
+/**
+ * 注解配置不当时由{@link AnnotationUtils}抛出
+ */
 @SuppressWarnings("serial")
 public class AnnotationConfigurationException extends NestedRuntimeException {
 
