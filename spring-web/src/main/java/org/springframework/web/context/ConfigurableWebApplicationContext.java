@@ -38,16 +38,31 @@ import org.springframework.lang.Nullable;
  * @see ContextLoader#createWebApplicationContext
  * @see org.springframework.web.servlet.FrameworkServlet#createWebApplicationContext
  */
+
+/**
+ * 由可配置的Web应用程序上下文实现的接口。
+ * 由{@link ContextLoader}和{@link org.springframework.web.servlet.FrameworkServlet}支持。
+ * 注意：在调用从{@link org.springframework.context.ConfigurableApplicationContext}继承的{@link #refresh}方法之前，需要调用此接口的setter。
+ * 它们不会自行导致上下文的初始化。
+ * @see ContextLoader＃createWebApplicationContext
+ * @see org.springframework.web.servlet.FrameworkServlet＃createWebApplicationContext
+ */
 public interface ConfigurableWebApplicationContext extends WebApplicationContext, ConfigurableApplicationContext {
 
 	/**
 	 * Prefix for ApplicationContext ids that refer to context path and/or servlet name.
+	 */
+	/**
+	 * 应用程序上下文ID前缀
 	 */
 	String APPLICATION_CONTEXT_ID_PREFIX = WebApplicationContext.class.getName() + ":";
 
 	/**
 	 * Name of the ServletConfig environment bean in the factory.
 	 * @see javax.servlet.ServletConfig
+	 */
+	/**
+	 * {@link ServletConfig}bean名称
 	 */
 	String SERVLET_CONFIG_BEAN_NAME = "servletConfig";
 
@@ -58,12 +73,22 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	 * called after the setting of all configuration properties.
 	 * @see #refresh()
 	 */
+	/**
+	 * 为此Web应用程序上下文设置ServletContext。
+	 * 不引起上下文的初始化：在所有配置属性设置之后，都需要刷新。
+	 * @param servletContext
+	 */
 	void setServletContext(@Nullable ServletContext servletContext);
 
 	/**
 	 * Set the ServletConfig for this web application context.
 	 * Only called for a WebApplicationContext that belongs to a specific Servlet.
 	 * @see #refresh()
+	 */
+	/**
+	 * 为此Web应用程序上下文设置ServletConfig。
+	 * 仅调用属于特定Servlet的WebApplicationContext。
+	 * @param servletConfig
 	 */
 	void setServletConfig(@Nullable ServletConfig servletConfig);
 
@@ -78,6 +103,11 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	 * to be used for building a default context config location.
 	 * The root web application context does not have a namespace.
 	 */
+	/**
+	 * 设置此Web应用程序上下文的名称空间，以用于构建默认的上下文配置位置。
+	 * 根Web应用程序上下文没有名称空间。
+	 * @param namespace
+	 */
 	void setNamespace(@Nullable String namespace);
 
 	/**
@@ -91,6 +121,11 @@ public interface ConfigurableWebApplicationContext extends WebApplicationContext
 	 * i.e. with distinct locations separated by commas, semicolons or whitespace.
 	 * <p>If not set, the implementation is supposed to use a default for the
 	 * given namespace or the root web application context, as appropriate.
+	 */
+	/**
+	 * 以init-param样式设置此Web应用程序上下文的配置位置，即*，以不同的位置用逗号，分号或空格分隔。
+	 * 如果未设置，则实现应在给定的名称空间或根Web应用程序上下文中酌情使用默认值。
+	 * @param configLocation
 	 */
 	void setConfigLocation(String configLocation);
 
