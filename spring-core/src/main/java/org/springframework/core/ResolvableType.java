@@ -232,6 +232,7 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Return the underling Java {@link Type} being managed.
 	 */
+  /** 返回管理的Java类型，使用序列化类型包装器解除包装 */
 	public Type getType() {
 		return SerializableTypeWrapper.unwrap(this.type);
 	}
@@ -240,6 +241,7 @@ public class ResolvableType implements Serializable {
 	 * Return the underlying Java {@link Class} being managed, if available;
 	 * otherwise {@code null}.
 	 */
+  /** 返回原始类型 */
 	@Nullable
 	public Class<?> getRawClass() {
 		if (this.type == this.resolved) {
@@ -259,6 +261,7 @@ public class ResolvableType implements Serializable {
 	 * never return {@code null}. This method is primarily to provide access to additional
 	 * type information or meta-data that alternative JVM languages may provide.
 	 */
+  /** 返回解析类型的源 */
 	public Object getSource() {
 		Object source = (this.typeProvider != null ? this.typeProvider.getSource() : null);
 		return (source != null ? source : this.type);
@@ -408,6 +411,7 @@ public class ResolvableType implements Serializable {
 	 * Return {@code true} if this type resolves to a Class that represents an array.
 	 * @see #getComponentType()
 	 */
+  /** 是否是数组类型 */
 	public boolean isArray() {
 		if (this == NONE) {
 			return false;
@@ -421,6 +425,7 @@ public class ResolvableType implements Serializable {
 	 * {@link #NONE} if this type does not represent an array.
 	 * @see #isArray()
 	 */
+  /** 获取数组组件类型 */
 	public ResolvableType getComponentType() {
 		if (this == NONE) {
 			return NONE;

@@ -49,6 +49,7 @@ public interface Encoder<T> {
 	 * (can be {@code null} if not specified)
 	 * @return {@code true} if supported, {@code false} otherwise
 	 */
+  /** 编码器是否支持给定的源元素类型和MIME */
 	boolean canEncode(ResolvableType elementType, @Nullable MimeType mimeType);
 
 	/**
