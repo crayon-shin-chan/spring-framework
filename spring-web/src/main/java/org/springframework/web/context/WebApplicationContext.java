@@ -42,6 +42,15 @@ import org.springframework.lang.Nullable;
  * @since January 19, 2001
  * @see ServletContextAware#setServletContext
  */
+
+/**
+ * 提供Web应用程序配置的接口。
+ * 在应用程序运行时为只读，但是如果实现支持，则可以重新加载。
+ * 此接口在通用ApplicationContext接口中添加了一个{@code getServletContext（）}方法，并定义了一个众所周知的应用程序属性名称，该名称必须在引导过程中绑定到根上下文。
+ * 类似于通用应用程序上下文，Web应用程序上下文是分层的。 每个应用程序只有一个根上下文，而应用程序中的每个servlet（包括MVC框架中的调度程序servlet）都有自己的子上下文。
+ * 除了标准的应用程序上下文生命周期功能外，WebApplicationContext实现还需要检测{@link ServletContextAware} bean，并相应地调用{@code setServletContext}方法。
+ * @see ServletContextAware＃setServletContext
+ */
 public interface WebApplicationContext extends ApplicationContext {
 
 	/**
@@ -52,11 +61,21 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#getWebApplicationContext
 	 * @see org.springframework.web.context.support.WebApplicationContextUtils#getRequiredWebApplicationContext
 	 */
+	/**
+	 * 成功启动时将根WebApplicationContext绑定到的Context属性。
+	 * 注意：如果根上下文的启动失败，则此属性可以包含异常或错误作为值。
+	 * 使用WebApplicationContextUtils方便查找​​根WebApplicationContext。
+	 * @see org.springframework.web.context.support.WebApplicationContextUtils＃getWebApplicationContext
+	 * @see org.springframework.web.context.support.WebApplicationContextUtils＃getRequiredWebApplicationContext
+	 */
 	String ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE = WebApplicationContext.class.getName() + ".ROOT";
 
 	/**
 	 * Scope identifier for request scope: "request".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
+	 */
+	/**
+	 * 请求范围的范围标识符：“ request”。 *除了标准范围“ singleton”和“ prototype”之外，还受支持。
 	 */
 	String SCOPE_REQUEST = "request";
 
@@ -64,16 +83,26 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * Scope identifier for session scope: "session".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
+	/**
+	 * 会话范围的范围标识符：“会话”。 *除了标准范围“ singleton”和“ prototype”之外，还受支持。
+	 */
 	String SCOPE_SESSION = "session";
 
 	/**
 	 * Scope identifier for the global web application scope: "application".
 	 * Supported in addition to the standard scopes "singleton" and "prototype".
 	 */
+	/**
+	 * 全局Web应用程序范围的范围标识符：“应用程序”。 *除了标准范围“ singleton”和“ prototype”之外，还受支持。
+	 */
 	String SCOPE_APPLICATION = "application";
 
 	/**
 	 * Name of the ServletContext environment bean in the factory.
+	 * @see javax.servlet.ServletContext
+	 */
+	/**
+	 * 工厂中ServletContext环境Bean的名称。
 	 * @see javax.servlet.ServletContext
 	 */
 	String SERVLET_CONTEXT_BEAN_NAME = "servletContext";
@@ -87,12 +116,24 @@ public interface WebApplicationContext extends ApplicationContext {
 	 * @see javax.servlet.ServletConfig#getInitParameterNames()
 	 * @see javax.servlet.ServletConfig#getInitParameter(String)
 	 */
+	/**
+	 * 工厂中ServletContext init-params环境Bean的名称。
+	 * 注意：可能与ServletConfig参数合并。
+	 * ServletConfig参数覆盖同名的ServletContext参数。
+	 * @see javax.servlet.ServletContext＃getInitParameterNames（）
+	 * @see javax.servlet.ServletContext＃getInitParameter（String）
+	 * @see javax.servlet.ServletConfig＃getInitParameterNames（）
+	 * @see javax.servlet.ServletConfig＃getInitParameter（String）
+	 */
 	String CONTEXT_PARAMETERS_BEAN_NAME = "contextParameters";
 
 	/**
 	 * Name of the ServletContext attributes environment bean in the factory.
 	 * @see javax.servlet.ServletContext#getAttributeNames()
 	 * @see javax.servlet.ServletContext#getAttribute(String)
+	 */
+	/**
+	 * ServletContext attributes bean名称
 	 */
 	String CONTEXT_ATTRIBUTES_BEAN_NAME = "contextAttributes";
 
