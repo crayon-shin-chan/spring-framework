@@ -37,6 +37,15 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.context.support.ResourceBundleMessageSource
  * @see org.springframework.context.support.ReloadableResourceBundleMessageSource
  */
+
+/**
+ * 用于解析消息的策略接口，支持此类消息的参数化和国际化。
+ * Spring为生产提供了两种现成的实现：
+ * {@ link org.springframework.context.support.ResourceBundleMessageSource}：建立在标准{@link java.util.ResourceBundle}，共享其局限性。
+ * {@ link org.springframework.context.support.ReloadableResourceBundleMessageSource}：高度可配置，尤其是在重新加载消息定义方面。
+ * @see org.springframework.context.support.ResourceBundleMessageSource
+ * @see org.springframework.context.support.ReloadableResourceBundleMessageSource
+ */
 public interface MessageSource {
 
 	/**
@@ -52,6 +61,17 @@ public interface MessageSource {
 	 * @return the resolved message if the lookup was successful, otherwise
 	 * the default message passed as a parameter (which may be {@code null})
 	 * @see #getMessage(MessageSourceResolvable, Locale)
+	 * @see java.text.MessageFormat
+	 */
+	/**
+	 * 尝试解析该消息。如果未找到任何消息，则返回默认消息。
+	 * @param code 查找消息代码，例如'calculator.noRateSet'。
+	 *             鼓励MessageSource用户将消息名称基于合格的类或程序包名称，以避免潜在的冲突并确保最大程度的清晰度。
+	 * @param args 将参数数组填充为消息中的参数（消息中的参数看起来像“ {0}”，“ {1，date}”，“ {2，time}”），或{@code null}（如果没有）
+	 * @param defaultMessage 如果查找失败，则返回默认消息，以返回默认消息
+	 * @param locale 语言环境，在其中进行查找的语言环境
+	 * @return 如果查找成功，则返回已解析的消息，否则，返回默认消息作为参数传递（可能为{@code null}）
+	 * @see #getMessage（MessageSourceResolvable，Locale）
 	 * @see java.text.MessageFormat
 	 */
 	@Nullable
@@ -70,6 +90,14 @@ public interface MessageSource {
 	 * @throws NoSuchMessageException if no corresponding message was found
 	 * @see #getMessage(MessageSourceResolvable, Locale)
 	 * @see java.text.MessageFormat
+	 */
+	/**
+	 * 没有默认消息，抛出异常
+	 * @param code
+	 * @param args
+	 * @param locale
+	 * @return
+	 * @throws NoSuchMessageException
 	 */
 	String getMessage(String code, @Nullable Object[] args, Locale locale) throws NoSuchMessageException;
 
