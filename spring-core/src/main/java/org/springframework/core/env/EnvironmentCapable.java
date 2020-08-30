@@ -38,10 +38,26 @@ package org.springframework.core.env;
  * @see ConfigurableEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment()
  */
+
+/**
+ * 指示包含并公开{@link Environment}引用的组件的接口。
+ * 所有Spring应用程序上下文都是具有环境能力的，并且该接口主要用于在接受BeanFactory的框架方法中执行{@code instanceof}检查
+ * 与之交互或实际上可能不是ApplicationContext实例的实例环境，如果确实可用。
+ * 如上所述，{@ link org.springframework.context.ApplicationContext ApplicationContext}扩展了EnvironmentCapable
+ * 因此公开了一个{@link #getEnvironment()}方法
+ * 但是{@link org.springframework.context.ConfigurableApplicationContext}重新定义了{@link org.springframework.context.ConfigurableApplicationContext＃getEnvironment()}并缩小了签名范围，以返回{@link ConfigurableEnvironment}。
+ * 结果是环境对象是“只读的”，直到从ConfigurableApplicationContext访问该对象为止，此时也可以对其进行配置。
+ * @see ConfigurableEnvironment
+ * @see org.springframework.context
+ */
 public interface EnvironmentCapable {
 
 	/**
 	 * Return the {@link Environment} associated with this component.
+	 */
+	/**
+	 * 返回此组件关联的{@link Environment}
+	 * @return
 	 */
 	Environment getEnvironment();
 
