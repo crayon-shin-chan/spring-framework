@@ -30,6 +30,10 @@ package org.springframework.context;
  * @see org.springframework.context.event.ApplicationEventMulticaster
  * @see org.springframework.context.event.EventPublicationInterceptor
  */
+
+/**
+ * 封装事件发布功能的接口。
+ */
 @FunctionalInterface
 public interface ApplicationEventPublisher {
 
@@ -43,6 +47,16 @@ public interface ApplicationEventPublisher {
 	 * to be as efficient as possible, individually using asynchronous
 	 * execution for longer-running and potentially blocking operations.
 	 * @param event the event to publish
+	 * @see #publishEvent(Object)
+	 * @see org.springframework.context.event.ContextRefreshedEvent
+	 * @see org.springframework.context.event.ContextClosedEvent
+	 */
+	/**
+	 * 向此应用程序注册的所有匹配侦听器通知一个应用程序事件。
+	 * 事件可以是框架事件（例如ContextRefreshedEvent）或特定于应用程序的事件。
+	 * 这样的事件发布步骤实际上是多播器的移交，它并不意味着同步/异步执行甚至根本不表示立即执行。
+	 * 鼓励事件侦听器尽可能地高效，单独使用异步进行长时间运行并可能阻塞操作
+	 * @param event 要发布的事件
 	 * @see #publishEvent(Object)
 	 * @see org.springframework.context.event.ContextRefreshedEvent
 	 * @see org.springframework.context.event.ContextClosedEvent
