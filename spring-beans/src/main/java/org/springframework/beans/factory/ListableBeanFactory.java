@@ -55,6 +55,21 @@ import org.springframework.lang.Nullable;
  * @see HierarchicalBeanFactory
  * @see BeanFactoryUtils
  */
+
+/**
+ * {@link BeanFactory}接口的扩展将由bean工厂来实现，可以枚举其所有bean实例，而不是按照客户的要求按名称一一尝试查找bean。
+ * 预加载其所有bean定义的BeanFactory实现（例如基于XML的工厂）可以实现此接口。
+ * 如果这是一个{@link HierarchicalBeanFactory}，则返回值将不考虑任何BeanFactory层次结构，而仅与当前工厂中定义的bean有关。
+ * 也可以使用{@link BeanFactoryUtils}帮助程序类来考虑祖先工厂中的bean。
+ * 此接口中的方法将仅遵守该工厂的bean定义。
+ * 它们将忽略通过其他方式（{@link org.springframework.beans.factory.config.ConfigurableBeanFactory}的{@code registerSingleton}方法）注册的任何单例bean，
+ * 但{@code getBeanNamesForType }和{@code getBeansOfType}也会检查这样的手动注册单例。
+ * 当然，BeanFactory的{@code getBean} 确实也允许透明访问此类特殊bean。
+ * 但是，在典型的场景中，无论如何，所有bean都将由外部bean定义来定义，因此大多数应用程序不需要担心这种区别。
+ * 注意：除了{@code getBeanDefinitionCount}和{@code containsBeanDefinition}之外，此接口中的方法并非设计用于频繁调用。实施可能很慢。
+ * @see HierarchicalBeanFactory
+ * @see BeanFactoryUtils
+ */
 public interface ListableBeanFactory extends BeanFactory {
 
 	/**
@@ -66,6 +81,12 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @return if this bean factory contains a bean definition with the given name
 	 * @see #containsBean
 	 */
+	/**
+	 * 检查此bean工厂是否包含具有给定名称的bean定义。
+	 * 不考虑该工厂可能参与的任何层次结构，并且忽略通过定义以外的其他方式注册的任何单例Bean。
+	 * @param beanName: 要查找的bean的名称如
+	 * @return
+	 */
 	boolean containsBeanDefinition(String beanName);
 
 	/**
@@ -74,6 +95,11 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * and ignores any singleton beans that have been registered by
 	 * other means than bean definitions.
 	 * @return the number of beans defined in the factory
+	 */
+	/**
+	 * 返回工厂定义的bean数
+	 * 不考虑该工厂可能参与的任何层次结构，并且忽略通过Bean定义以外的其他方式注册的任何单例Bean。
+	 * @return 工厂定义的bean数
 	 */
 	int getBeanDefinitionCount();
 
@@ -84,6 +110,11 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * other means than bean definitions.
 	 * @return the names of all beans defined in this factory,
 	 * or an empty array if none defined
+	 */
+	/**
+	 * 返回此工厂中定义的所有bean的名称。
+	 * 不考虑该工厂可能参与的任何层次结构，并且忽略通过Bean定义以外的其他方式注册的任何单例Bean。
+	 * @return 此工厂中定义的所有bean的名称，如果没有定义，则返回一个空数组
 	 */
 	String[] getBeanDefinitionNames();
 
@@ -100,6 +131,16 @@ public interface ListableBeanFactory extends BeanFactory {
 	 * @see #getBeanProvider(Class)
 	 * @see #getBeansOfType(Class, boolean, boolean)
 	 * @see #getBeanNamesForType(Class, boolean, boolean)
+	 */
+	/**
+	 * 返回指定bean的提供程序，以允许按需延迟检索实例，包括可用性和唯一性选项。
+	 * @param requiredType bean必须匹配的类型；可以是接口，也可以是超类
+	 * @param allowEagerInit 基于流的访问是否可以初始化
+	 * @see #getBeanProvider（ResolvableType，boolean）
+	 * @see #getBeanProvider（Class）
+	 * @see #getBeansOfType（Class，boolean，boolean ）
+	 * @see #getBeanNamesForType（Class，boolean，boolean）
+	 * @return 相应的提供程序句柄
 	 */
 	<T> ObjectProvider<T> getBeanProvider(Class<T> requiredType, boolean allowEagerInit);
 
