@@ -53,6 +53,14 @@ import org.springframework.util.Assert;
  * @see ClassPathBeanDefinitionScanner
  * @see org.springframework.context.support.GenericXmlApplicationContext
  */
+
+/**
+ * 独立的应用程序上下文，接受组件类作为输入
+ * 特别是{@link Configuration}注释的类，但也可以是普通的{@link org.springframework.stereotype.Component}类型和使用{@code javax.inject}批注的符合JSR-330的类。
+ * 允许使用{@link #register(Class ...)}一一注册类，以及使用{@link #scan(String ...)}进行类路径扫描。
+ * 在有多个{@code @Configuration}类的情况下，在以后的类中定义的{@link Bean @Bean}方法将覆盖在先前的类中定义的方法。
+ * 可以通过一个额外的{@code @Configuration}类来故意重写某些bean的定义。
+ */
 public class AnnotationConfigApplicationContext extends GenericApplicationContext implements AnnotationConfigRegistry {
 
 	private final AnnotatedBeanDefinitionReader reader;
@@ -64,6 +72,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
+	/**
+	 * 创建一个新的AnnotationConfigApplicationContext，
+	 * 它需要通过{@link #register}调用进行填充，然后手动{@linkplain #refresh refreshed}。
+	 * 也就是创建后还没有启动
+	 */
 	public AnnotationConfigApplicationContext() {
 		StartupStep createAnnotatedBeanDefReader = this.getApplicationStartup().start("spring.context.annotated-bean-reader.create");
 		this.reader = new AnnotatedBeanDefinitionReader(this);
@@ -74,6 +87,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	/**
 	 * Create a new AnnotationConfigApplicationContext with the given DefaultListableBeanFactory.
 	 * @param beanFactory the DefaultListableBeanFactory instance to use for this context
+	 */
+	/**
+	 * 使用给定的DefaultListableBeanFactory创建一个新的AnnotationConfigApplicationContext。
+	 * @param beanFactory 用于此上下文的DefaultListableBeanFactory实例
 	 */
 	public AnnotationConfigApplicationContext(DefaultListableBeanFactory beanFactory) {
 		super(beanFactory);
@@ -87,6 +104,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @param componentClasses one or more component classes &mdash; for example,
 	 * {@link Configuration @Configuration} classes
 	 */
+	/**
+	 * 创建一个新的AnnotationConfigApplicationContext，从给定的组件类派生bean定义，并自动刷新上下文。
+	 * @param componentClasses 一个或多个组件类-例如，* {@link Configuration}类
+	 * 也就是创建完毕后，容器已经启动
+	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
 		this();
 		register(componentClasses);
@@ -99,6 +121,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * and automatically refreshing the context.
 	 * @param basePackages the packages to scan for component classes
 	 */
+	/**
+	 * 创建一个新的AnnotationConfigApplicationContext，在给定的包中扫描组件，为这些组件注册bean定义，然后自动刷新上下文。
+	 * @param basePackages 软件包以扫描组件类
+	 */
 	public AnnotationConfigApplicationContext(String... basePackages) {
 		this();
 		scan(basePackages);
@@ -109,6 +135,10 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	/**
 	 * Propagate the given custom {@code Environment} to the underlying
 	 * {@link AnnotatedBeanDefinitionReader} and {@link ClassPathBeanDefinitionScanner}.
+	 */
+	/**
+	 * 将给定的自定义{@code Environment}传播到基础的* {@link AnnotatedBeanDefinitionReader}和{@link ClassPathBeanDefinitionScanner}。
+	 * @param environment
 	 */
 	@Override
 	public void setEnvironment(ConfigurableEnvironment environment) {
@@ -128,11 +158,20 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see AnnotationBeanNameGenerator
 	 * @see FullyQualifiedAnnotationBeanNameGenerator
 	 */
+	/**
+	 * 提供一个自定义的{@link BeanNameGenerator}，
+	 * 以便与{@link AnnotatedBeanDefinitionReader}和{@link ClassPathBeanDefinitionScanner}一起使用。
+	 * 默认值为{@link AnnotationBeanNameGenerator}。对此方法的任何调用必须在调用{@link #register（Class ...）}和{@link #scan（String ...）}之前进行。
+	 * @see AnnotatedBeanDefinitionReader＃setBeanNameGenerator
+	 * @see ClassPathBeanDefinitionScanner＃setBeanNameGenerator
+	 * @see AnnotationBeanNameGenerator
+	 * @see FullyQualifiedAnnotationBeanNameGenerator
+	 */
 	public void setBeanNameGenerator(BeanNameGenerator beanNameGenerator) {
 		this.reader.setBeanNameGenerator(beanNameGenerator);
 		this.scanner.setBeanNameGenerator(beanNameGenerator);
-		getBeanFactory().registerSingleton(
-				AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR, beanNameGenerator);
+		/** {@link BeanNameGenerator}设置为Bean */
+		getBeanFactory().registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR, beanNameGenerator);
 	}
 
 	/**
@@ -140,6 +179,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * <p>The default is an {@link AnnotationScopeMetadataResolver}.
 	 * <p>Any call to this method must occur prior to calls to {@link #register(Class...)}
 	 * and/or {@link #scan(String...)}.
+	 */
+	/**
+	 * 设置{@link ScopeMetadataResolver}以用于已注册的组件类。
+	 * 默认值为{@link AnnotationScopeMetadataResolver}。
+	 * 对该方法的任何调用都必须在调用{@link #register（Class ...）}和{@link #scan（String ...）}之前进行。
 	 */
 	public void setScopeMetadataResolver(ScopeMetadataResolver scopeMetadataResolver) {
 		this.reader.setScopeMetadataResolver(scopeMetadataResolver);
@@ -160,11 +204,19 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see #scan(String...)
 	 * @see #refresh()
 	 */
+	/**
+	 * 注册一个或多个要处理的组件类
+	 * 请注意，必须调用{@link #refresh（）}才能使上下文完全处理新类。
+	 * @param componentClasses 一个或多个组件类-例如，{@link Configuration}类
+	 * @see #scan（String ...）
+	 * @see #refresh（）
+	 */
 	@Override
 	public void register(Class<?>... componentClasses) {
 		Assert.notEmpty(componentClasses, "At least one component class must be specified");
-		StartupStep registerComponentClass = this.getApplicationStartup().start("spring.context.component-classes.register")
-				.tag("classes", () -> Arrays.toString(componentClasses));
+		/* 记录启动步骤 */
+		StartupStep registerComponentClass = this.getApplicationStartup().start("spring.context.component-classes.register").tag("classes", () -> Arrays.toString(componentClasses));
+		/* 注册到读取器 */
 		this.reader.register(componentClasses);
 		registerComponentClass.end();
 	}
@@ -177,11 +229,19 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * @see #register(Class...)
 	 * @see #refresh()
 	 */
+	/**
+	 * 在指定的基本程序包中执行扫描。
+	 * 请注意，必须调用{@link #refresh（）}才能使上下文*完全处理新类。
+	 * @param basePackages 软件包以扫描组件类
+	 * @see #register（Class ...）
+	 * @see #refresh（）
+	 */
 	@Override
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		StartupStep scanPackages = this.getApplicationStartup().start("spring.context.base-packages.scan")
 				.tag("packages", () -> Arrays.toString(basePackages));
+		/* 包注册到扫描器 */
 		this.scanner.scan(basePackages);
 		scanPackages.end();
 	}
@@ -191,6 +251,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	// Adapt superclass registerBean calls to AnnotatedBeanDefinitionReader
 	//---------------------------------------------------------------------
 
+	/* 直接注册Bean */
 	@Override
 	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass,
 			@Nullable Supplier<T> supplier, BeanDefinitionCustomizer... customizers) {
