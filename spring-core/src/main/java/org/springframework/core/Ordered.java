@@ -51,14 +51,14 @@ public interface Ordered {
 	 * Useful constant for the highest precedence value.
 	 * @see java.lang.Integer#MIN_VALUE
 	 */
-  /** 最高优先级常数，最小整数 */
+  	/** 最高优先级常数，最小整数 */
 	int HIGHEST_PRECEDENCE = Integer.MIN_VALUE;
 
 	/**
 	 * Useful constant for the lowest precedence value.
 	 * @see java.lang.Integer#MAX_VALUE
 	 */
-  /** 最低优先级常数，最大整数 */
+  	/** 最低优先级常数，最大整数 */
 	int LOWEST_PRECEDENCE = Integer.MAX_VALUE;
 
 
@@ -73,10 +73,10 @@ public interface Ordered {
 	 * @see #HIGHEST_PRECEDENCE
 	 * @see #LOWEST_PRECEDENCE
 	 */
-  /** 获取此对象的排序值
-   * 较高的值被解释为较低的优先级，具有最低值的对象具有Uzi高优先级
-   * 相同的顺序值将导致任意排序位置
-   */
+  	/** 获取此对象的排序值
+   	 * 较高的值被解释为较低的优先级，具有最低值的对象具有Uzi高优先级
+   	 * 相同的顺序值将导致任意排序位置
+   	 */
 	int getOrder();
 
 }

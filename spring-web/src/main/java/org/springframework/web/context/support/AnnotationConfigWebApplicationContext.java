@@ -96,7 +96,7 @@ import org.springframework.web.context.ContextLoader;
  * 也可以直接实例化此类并将其注入到Spring的{@code DispatcherServlet}或{@code ContextLoaderListener}中。
  * {@code web.xml}的基于代码的替代方法。
  * 与{@link XmlWebApplicationContext}不同，不假定默认配置类位置。
- * 而是需要为{@link ContextLoader}设置* {@linkContextLoader＃CONFIG_LOCATION_PARAM}
+ * 而是需要为{@link ContextLoader}设置* {@link ContextLoader＃CONFIG_LOCATION_PARAM}
  * context-param和/或为* FrameworkServlet设置“ contextConfigLocation” init-param。
  * 参数值可能包含标准的类名和用于扫描组件的基本包。有关如何处理这些位置的确切详细信息，请参见{@link #loadBeanDefinitions}
  * 作为设置“contextConfigLocation”参数的替代方法，用户可以实现{@link org.springframework.context.ApplicationContextInitializer}
