@@ -83,17 +83,48 @@ import org.springframework.web.context.ContextLoader;
  * @since 3.0
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
+
+/**
+ * {@link org.springframework.web.context.WebApplicationContext}的实现
+ * 接受组件类作为输入的，特别是{@link org.springframework.context.annotation.Configuration}注释类，
+ * 但也可以使用{@code javax.inject}注释，使用普通的{@link org.springframework.stereotype.Component}类和符合JSR-330的类。
+ * 允许一一注册类（将类名指定为config位置），以及进行类路径扫描（将基本包指定为配置位置）。
+ * 对于Web环境，这基本上等同于{@link org.springframework.context.annotation.AnnotationConfigApplicationContext}。
+ * 要利用此应用程序上下文，必须将ContextLoader的{@link ContextLoader＃CONTEXT_CLASS_PARAM“ contextClass”}上下文参数
+ * 或FrameworkServlet的“contextClass”初始化参数设置为此类的全名名称。
+ * 从Spring 3.1开始，使用{@link org.springframework.web.WebApplicationInitializer}时，
+ * 也可以直接实例化此类并将其注入到Spring的{@code DispatcherServlet}或{@code ContextLoaderListener}中。
+ * {@code web.xml}的基于代码的替代方法。
+ * 与{@link XmlWebApplicationContext}不同，不假定默认配置类位置。
+ * 而是需要为{@link ContextLoader}设置* {@linkContextLoader＃CONFIG_LOCATION_PARAM}
+ * context-param和/或为* FrameworkServlet设置“ contextConfigLocation” init-param。
+ * 参数值可能包含标准的类名和用于扫描组件的基本包。有关如何处理这些位置的确切详细信息，请参见{@link #loadBeanDefinitions}
+ * 作为设置“contextConfigLocation”参数的替代方法，用户可以实现{@link org.springframework.context.ApplicationContextInitializer}
+ * 并设置{@linkplain ContextLoader＃CONTEXT_INITIALIZER_CLASSES_PARAM}上下文-param/init-param。
+ * 在这种情况下，用户应优先使用{@link #setConfigLocation（String）}方法，而不是{@link #refresh（）}和{@link #scan（String ...）}方法通过{@code ContextLoader}。
+ * 注意：如果有多个{@code @Configuration}类，则以后的{@code @Bean}定义将覆盖较早加载的文件中定义的定义。
+ * 通过额外的{@code @Configuration}类，可以利用故意覆盖某些Bean定义。
+ * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
+ */
 public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWebApplicationContext
 		implements AnnotationConfigRegistry {
 
+	/**
+	 * bean名称生成器
+	 */
 	@Nullable
 	private BeanNameGenerator beanNameGenerator;
 
+	/**
+	 * {@link org.springframework.context.annotation.Scope}注解元数据解析器
+	 */
 	@Nullable
 	private ScopeMetadataResolver scopeMetadataResolver;
 
+	/* 配置组件类集合 */
 	private final Set<Class<?>> componentClasses = new LinkedHashSet<>();
 
+	/* 配置类基础包集合 */
 	private final Set<String> basePackages = new LinkedHashSet<>();
 
 
@@ -149,9 +180,19 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see #setConfigLocation(String)
 	 * @see #refresh()
 	 */
+	/**
+	 * 注册一个或多个要处理的组件类。
+	 * 请注意，必须调用{@link #refresh（）}才能使上下文完全处理新类。
+	 * @param componentClasses 一个或多个组件类，例如{@link org.springframework.context.annotation.Configuration}类
+	 * @see #scan（String ...）
+	 * @see #loadBeanDefinitions（DefaultListableBeanFactory）
+	 * @see #setConfigLocation（String）
+	 * @see #refresh（）
+	 */
 	@Override
 	public void register(Class<?>... componentClasses) {
 		Assert.notEmpty(componentClasses, "At least one component class must be specified");
+		/* 将组件类添加到集合 */
 		Collections.addAll(this.componentClasses, componentClasses);
 	}
 
@@ -165,9 +206,19 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see #setConfigLocation(String)
 	 * @see #refresh()
 	 */
+	/**
+	 * 在指定的基本程序包中执行扫描。
+	 * 请注意，必须调用{@link #refresh（）}才能使上下文完全处理新类。
+	 * @param basePackages 打包软件包以检查组件类
+	 * @see #loadBeanDefinitions（DefaultListableBeanFactory）
+	 * @see #register（Class ...）
+	 * @see #setConfigLocation（String）
+	 * @see #refresh（）
+	 */
 	@Override
 	public void scan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
+		/* 将包添加到集合 */
 		Collections.addAll(this.basePackages, basePackages);
 	}
 
