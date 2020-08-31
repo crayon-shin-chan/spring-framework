@@ -59,6 +59,22 @@ import org.springframework.beans.BeansException;
  * @see BeanPostProcessor
  * @see PropertyResourceConfigurer
  */
+
+/**
+ * 工厂狗子允许自定义修改应用程序上下文的bean定义，以适应上下文基础bean工厂的bean属性值。
+ * 对于面向系统管理员的自定义配置文件很有用，这些文件会覆盖在应用程序上下文中配置的bean属性。
+ * {@link PropertyResourceConfigurer}及其具体实现，以了解可以解决此类配置需求的现成解决方案。
+ * {@code BeanFactoryPostProcessor}可以与bean定义进行交互并对其进行修改，但不能与bean实例进行交互。这样做可能会导致bean实例化过早，从而违反了容器并造成了意想不到的副作用。
+ * 如果需要与bean实例交互，请考虑实施{@link BeanPostProcessor}。
+ * 注册{@code ApplicationContext}在其bean定义中自动检测{@code BeanFactoryPostProcessor}bean，并在创建任何其他bean之前应用它们。
+ * 也可以通过{@code ConfigurableApplicationContext}以编程方式注册{@code BeanFactoryPostProcessor}。
+ * 订购在{@code ApplicationContext}中自动检测到的{@code BeanFactoryPostProcessor} bean
+ * 将根据{@link org.springframework.core.PriorityOrdered}和{@link org.springframework.core.Ordered}语义。
+ * 相比之下，以编程方式注册了{{code BeanFactoryPostProcessor}的bean将以注册的顺序应用。
+ * 对于以编程方式注册的后处理器，将忽略通过实现{@code PriorityOrdered}或{@code Ordered}接口表示的任何排序语义。
+ * 此外，对于{@code BeanFactoryPostProcessor} bean，不考虑{@link org.springframework.core.annotation.Order}批注。
+ * @作者Juergen Hoeller * @作者Sam Brannen * @自从06.07.2003 * @see BeanPostProcessor * @see PropertyResourceConfigurer
+ */
 @FunctionalInterface
 public interface BeanFactoryPostProcessor {
 
@@ -69,6 +85,13 @@ public interface BeanFactoryPostProcessor {
 	 * properties even to eager-initializing beans.
 	 * @param beanFactory the bean factory used by the application context
 	 * @throws org.springframework.beans.BeansException in case of errors
+	 */
+	/**
+	 * 在标准初始化之后，修改应用程序上下文的内部bean工厂。
+	 * 所有bean定义都将被加载，但是还没有实例化bean。
+	 * 这甚至可以覆盖或添加属性，甚至可以用于初始化bean。
+	 * @param beanFactory 应用程序上下文使用的bean工厂
+	 * @throws BeansException org.springframework.beans.BeansException
 	 */
 	void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException;
 
