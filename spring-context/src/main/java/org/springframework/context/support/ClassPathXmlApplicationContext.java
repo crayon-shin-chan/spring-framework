@@ -49,8 +49,21 @@ import org.springframework.util.Assert;
  * @see #getResourceByPath
  * @see GenericApplicationContext
  */
+/**
+ * 独立的XML应用程序上下文，从类路径中获取上下文定义文件，将纯路径解释为包含包路径的类路径资源名称（例如“mypackage/myresource.txt”）。
+ * 对于测试工具以及JAR中嵌入的应用程序上下文很有用。
+ * 可以通过{@link #getConfigLocations}覆盖配置位置的默认值，配置位置可以表示诸如“/myfiles/context.xml”之类的具体文件或诸如“/myfiles/*-”之类的Ant样式模式context.xml”
+ * 有关模式的详细信息，请参阅{@link org.springframework.util.AntPathMatcher}。
+ * 注意：如果有多个配置位置，则较新的Bean定义将覆盖较早加载的文件中定义的定义。可以利用它来通过一个额外的XML文件故意覆盖某些bean定义。
+ * 这是一个简单的一站式商店便捷ApplicationContext。
+ * 考虑结合使用{@link GenericApplicationContext}类与{@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}以实现更灵活的上下文设置。
+ * @see #getResource
+ * @see #getResourceByPath
+ * @see GenericApplicationContext
+ */
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
 
+	/* 配置资源 */
 	@Nullable
 	private Resource[] configResources;
 
