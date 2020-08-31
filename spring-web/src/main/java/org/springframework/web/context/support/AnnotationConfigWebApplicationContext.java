@@ -245,9 +245,25 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see AnnotatedBeanDefinitionReader
 	 * @see ClassPathBeanDefinitionScanner
 	 */
+	/**
+	 * 为{@link #register（Class ...）}指定的任何类注册{@link org.springframework.beans.factory.config.BeanDefinition}并扫描{@link #scan（String）指定的任何包。 ..）}。
+	 * 对于{@link #setConfigLocation（String）}或* {@link #setConfigLocations（String []）}指定的任何值，请首先尝试将每个位置加载为类，并注册{@code BeanDefinition}如果类加载成功，
+	 * 如果类加载失败（即引发{@code ClassNotFoundException}），则假定该值是一个包，并尝试对其进行扫描以查找组件类。
+	 * 启用注释配置后处理器的默认集合，例如，可以使用{@code @Autowired}，{@code @Required}和关联的注释。
+	 * 除非向原型注释提供了{@code value}属性，否则将向生成的bean定义名称注册配置类bean定义。
+	 * @param beanFactory Bean工厂，用于将bean定义加载到
+	 * @see #register（Class ...）
+	 * @see #scan（String ...）
+	 * @see #setConfigLocation（String）
+	 * @see #setConfigLocations（String [ ]）
+	 * @see AnnotatedBeanDefinitionReader
+	 * @see ClassPathBeanDefinitionScanner
+	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
+		/* 注解Bean定义读取器 */
 		AnnotatedBeanDefinitionReader reader = getAnnotatedBeanDefinitionReader(beanFactory);
+		/* 类路径Bean定义扫描 */
 		ClassPathBeanDefinitionScanner scanner = getClassPathBeanDefinitionScanner(beanFactory);
 
 		BeanNameGenerator beanNameGenerator = getBeanNameGenerator();
@@ -263,6 +279,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 			scanner.setScopeMetadataResolver(scopeMetadataResolver);
 		}
 
+		/* 注解Bean定义读取器注册组件类 */
 		if (!this.componentClasses.isEmpty()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Registering component classes: [" +
@@ -271,6 +288,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 			reader.register(ClassUtils.toClassArray(this.componentClasses));
 		}
 
+		/* 扫描基础包路径 */
 		if (!this.basePackages.isEmpty()) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Scanning base packages: [" +
@@ -279,10 +297,12 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 			scanner.scan(StringUtils.toStringArray(this.basePackages));
 		}
 
+		/* 处理配置路径 */
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			for (String configLocation : configLocations) {
 				try {
+					/* 将配置路径解析为配置类 */
 					Class<?> clazz = ClassUtils.forName(configLocation, getClassLoader());
 					if (logger.isTraceEnabled()) {
 						logger.trace("Registering [" + configLocation + "]");
@@ -294,6 +314,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 						logger.trace("Could not load class for config location [" + configLocation +
 								"] - trying package scan. " + ex);
 					}
+					/* 如果不能解析为类，则解析为基础包路径 */
 					int count = scanner.scan(configLocation);
 					if (count == 0 && logger.isDebugEnabled()) {
 						logger.debug("No component classes found for specified class/package [" + configLocation + "]");
