@@ -53,6 +53,20 @@ import org.springframework.lang.Nullable;
  * @see #getResourceByPath
  * @see GenericApplicationContext
  */
+
+/**
+ * 独立XML应用程序上下文，从文件系统或URL中获取上下文定义文件，将纯路径解释为相对文件系统位置（例如“ mydir / myfile.txt”）。
+ * 对于测试工具和独立环境有用。
+ * 注意：普通路径始终被解释为相对于当前VM工作目录的相对，即使它们以斜杠开头。（这与Servlet容器中的语义是一致的。）
+ * 使用显式的“file”前缀来强制执行绝对文件路径。
+ * 可以通过以下方法覆盖默认的配置位置{@link #getConfigLocations}，配置位置可以表示具体文件，例如“/myfiles/context.xml”，也可以表示Ant样式的模式，例如“ / myfiles / *-context.xml”
+ * {@link org。 springframework.util.AntPathMatcher}。
+ * 注意：如果有多个配置位置，则较新的Bean定义将覆盖之前的Bean定义。可以利用它来通过一个额外的XML文件故意覆盖某些bean定义。
+ * 这是一个简单的一站式商店便捷ApplicationContext。 虑结合使用{@link GenericApplicationContext}类与{@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}以实现更灵活的上下文设置。
+ * @see #getResource
+ * @see #getResourceByPath
+ * @see GenericApplicationContext
+ */
 public class FileSystemXmlApplicationContext extends AbstractXmlApplicationContext {
 
 	/**
