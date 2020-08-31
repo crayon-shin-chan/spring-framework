@@ -50,7 +50,7 @@ import org.springframework.lang.Nullable;
  * 子类仅需要实现{@link #getConfigResources}和{@link #getConfigLocations}方法。
  * 此外，它们可能会覆盖{@link #getResourceByPath}钩子，以特定于环境的方式解释相对路径，和{@link #getResourcePatternResolver}以扩展模式解析。
  * @see #getConfigResources
- * @see #getConfigLocations 
+ * @see #getConfigLocations
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
