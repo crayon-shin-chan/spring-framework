@@ -36,12 +36,22 @@ import org.springframework.util.StringUtils;
  * @see #setConfigLocations
  * @see #getDefaultConfigLocations
  */
+
+/**
+ * @link AbstractRefreshableApplicationContext}子类，它添加了对指定配置位置的通用处理。
+ * 充当基于XML的应用程序上下文实现（例如{@link ClassPathXmlApplicationContext}和{@link FileSystemXmlApplicationContext}以及{@link org.springframework.web.context.support.XmlWebApplicationContext}的基类。
+ * @see #setConfigLocation
+ * @see #setConfigLocations
+ * @see #getDefaultConfigLocations
+ */
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
 
+	/* 配置文件位置 */
 	@Nullable
 	private String[] configLocations;
 
+	/* 是否已经调用setId方法 */
 	private boolean setIdCalled = false;
 
 
@@ -73,6 +83,10 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * Set the config locations for this application context.
 	 * <p>If not set, the implementation may use a default as appropriate.
 	 */
+	/**
+	 * 设置此应用程序上下文的配置位置。 * <p>如果未设置，则实现可酌情使用默认值。
+	 * @param locations
+	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
 			Assert.noNullElements(locations, "Config locations must not be null");
@@ -93,6 +107,13 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * <p>The default implementation returns {@code null}. Subclasses can override
 	 * this to provide a set of resource locations to load bean definitions from.
 	 * @return an array of resource locations, or {@code null} if none
+	 * @see #getResources
+	 * @see #getResourcePatternResolver
+	 */
+	/**
+	 * 返回一个资源位置数组，引用此上下文应使用的XML bean定义文件。还可以包括位置模式，这将通过ResourcePatternResolver进行解析。
+	 * 默认实现返回{@code null}。子类可以重写，以提供一组资源位置以从中加载bean定义。
+	 * @return 资源位置的数组，如果没有则返回{@code null}
 	 * @see #getResources
 	 * @see #getResourcePatternResolver
 	 */
@@ -147,6 +168,9 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	/**
 	 * Triggers {@link #refresh()} if not refreshed in the concrete context's
 	 * constructor already.
+	 */
+	/**
+	 * 如果尚未在具体上下文的*构造函数中刷新，则触发{@link #refresh（）}。
 	 */
 	@Override
 	public void afterPropertiesSet() {
