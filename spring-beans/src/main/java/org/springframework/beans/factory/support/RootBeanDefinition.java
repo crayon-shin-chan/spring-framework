@@ -29,6 +29,7 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -91,10 +92,12 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	final Object constructorArgumentLock = new Object();
 
 	/** Package-visible field for caching the resolved constructor or factory method. */
+	/* 用于缓存已解析的构造函数或工厂方法。 */
 	@Nullable
 	Executable resolvedConstructorOrFactoryMethod;
 
 	/** Package-visible field that marks the constructor arguments as resolved. */
+	/* 将构造函数参数标记为已解决。 */
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments. */
@@ -111,7 +114,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied. */
 	boolean postProcessed = false;
 
-	/** Package-visible field that indicates a before-instantiation post-processor having kicked in. */
+	/** 程序包可见的字段，指示已启动实例化前的后处理器。
+	 * 是否使用{@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation(Class, String)}初始化bean实例
+	 */
 	@Nullable
 	volatile Boolean beforeInstantiationResolved;
 

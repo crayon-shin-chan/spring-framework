@@ -33,6 +33,11 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 1.1
  */
+
+/**
+ * 负责创建与根bean定义相对应的实例的接口。
+ * 由于可能采用各种方法，因此将其引入策略中，包括使用CGLIB动态创建子类以支持方法注入
+ */
 public interface InstantiationStrategy {
 
 	/**
@@ -44,6 +49,14 @@ public interface InstantiationStrategy {
 	 * @param owner the owning BeanFactory
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
+	 */
+	/**
+	 * 在此工厂中以给定名称返回Bean的实例。
+	 * @param bd bean定义
+	 * @param beanName 在此上下文中创建bean时的名称。 如果我们正在自动装配不属于工厂的bean，则名称可以为{@code null}。
+	 * @param owner 所属的BeanFactory
+	 * @return 此bean定义的bean实例
+	 * @throws BeansException 如果实例化尝试失败，则抛出BeansException
 	 */
 	Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner)
 			throws BeansException;
@@ -60,6 +73,16 @@ public interface InstantiationStrategy {
 	 * @param args the constructor arguments to apply
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
+	 */
+	/**
+	 * 返回该工厂中具有给定名称的Bean实例，通过给定的构造函数创建它。
+	 * @param bd bean定义
+	 * @param beanName 在此上下文中创建bean时的名称。如果我们正在自动装配不属于工厂的bean，则名称可以为{@code null}。
+	 * @param owner 拥有的BeanFactory
+	 * @param ctor 构造函数使用
+	 * @param args 应用构造函数参数
+	 * @return 此bean定义的bean实例
+	 * @throws BeansException 如果实例化尝试失败，则抛出BeansException
 	 */
 	Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			Constructor<?> ctor, Object... args) throws BeansException;
@@ -78,6 +101,17 @@ public interface InstantiationStrategy {
 	 * @param args the factory method arguments to apply
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
+	 */
+	/**
+	 * 在该工厂中返回具有给定名称的Bean实例，通过给定的工厂方法创建它。
+	 * @param bd bean定义
+	 * @param beanName 在此上下文中创建bean时的名称。如果我们正在自动装配不属于工厂的bean，则名称可以为{@code null}。
+	 * @param owner 拥有的BeanFactory
+	 * @param factoryBean 用于调用工厂方法的工厂bean实例，如果是静态工厂方法，则为*或{@code null}
+	 * @param factoryMethod 要使用的工厂方法
+	 * @param args 要应用的工厂方法参数
+	 * @return 此bean定义的bean实例
+	 * @throws BeansException 如果实例化尝试失败，则抛出BeansException
 	 */
 	Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			@Nullable Object factoryBean, Method factoryMethod, Object... args)

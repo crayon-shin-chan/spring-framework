@@ -1136,6 +1136,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Checks for existence of a method with the specified name.
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
+	/**
+	 * 验证并准备为此bean定义的方法替代。 检查是否存在具有指定名称的方法。
+	 * @throws BeanDefinitionValidationException 如果验证失败，则抛出BeanDefinitionValidationException
+	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
 		// Check that lookup methods exist and determine their overloaded status.
 		if (hasMethodOverrides()) {

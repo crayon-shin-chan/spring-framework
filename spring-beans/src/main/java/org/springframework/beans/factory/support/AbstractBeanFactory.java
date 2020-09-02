@@ -1718,11 +1718,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @return the resolved bean class (or {@code null} if none)
 	 * @throws CannotLoadBeanClassException if we failed to load the class
 	 */
+	/**
+	 * 为指定的bean定义解析bean类，将bean类名称解析为Class引用（如果需要）并将解析后的Class存储在bean定义中以备将来使用。
+	 * @param mbd 合并的bean定义，以确定类的类
+	 * @param beanName bean的名称（出于错误处理目的）
+	 * @param typesToMatch 类型以在内部类型匹配的情况下进行匹配（还表示返回了{@code Class}永远不会暴露给应用程序代码）
+	 * @return 已解析的bean类（如果没有则返回{@code null}）
+	 * @throws CannotLoadBeanClassException 如果我们无法加载该类，则CannotLoadBeanClassException
+	 */
 	@Nullable
 	protected Class<?> resolveBeanClass(RootBeanDefinition mbd, String beanName, Class<?>... typesToMatch)
 			throws CannotLoadBeanClassException {
 
 		try {
+			/* Bean定义有类，直接返回 */
 			if (mbd.hasBeanClass()) {
 				return mbd.getBeanClass();
 			}
@@ -2354,6 +2363,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Internal cache of pre-filtered post-processors.
 	 *
 	 * @since 5.3
+	 */
+	/**
+	 * 预先过滤的后处理器的内部缓存。 * * @从5.3开始
 	 */
 	static class BeanPostProcessorCache {
 
