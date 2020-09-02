@@ -40,20 +40,34 @@ import org.springframework.util.StringValueResolver;
  * @author Qimiao Chen
  * @since 2.5.2
  */
+
+/**
+ * {@link AliasRegistry}接口的简单实现。 
+ * 用作{@link org.springframework.beans.factory.support.BeanDefinitionRegistry}实现的基类。
+ */
 public class SimpleAliasRegistry implements AliasRegistry {
 
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/** Map from alias to canonical name. */
+	/**
+	 * 从别名到规范名称的映射
+	 */
 	private final Map<String, String> aliasMap = new ConcurrentHashMap<>(16);
 
-
+	/**
+	 * 注册别名
+	 * @param name 规范名称
+	 * @param alias 要注册的别名
+	 */
 	@Override
 	public void registerAlias(String name, String alias) {
+		/* 别名、规范名称都不能为空 */
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
 		synchronized (this.aliasMap) {
+			/* 别名、规范名称相同则移除 */
 			if (alias.equals(name)) {
 				this.aliasMap.remove(alias);
 				if (logger.isDebugEnabled()) {
@@ -61,21 +75,26 @@ public class SimpleAliasRegistry implements AliasRegistry {
 				}
 			}
 			else {
+				/* 获取别名对应的规范名称 */
 				String registeredName = this.aliasMap.get(alias);
 				if (registeredName != null) {
+					/* 已注册规范名称相等，什么都不做 */
 					if (registeredName.equals(name)) {
 						// An existing alias - no need to re-register
 						return;
 					}
+					/* 不允许覆盖别名，抛出异常 */
 					if (!allowAliasOverriding()) {
 						throw new IllegalStateException("Cannot define alias '" + alias + "' for name '" +
 								name + "': It is already registered for name '" + registeredName + "'.");
 					}
+					/* 允许覆盖别名，记录日志 */
 					if (logger.isDebugEnabled()) {
 						logger.debug("Overriding alias '" + alias + "' definition for registered name '" +
 								registeredName + "' with new target name '" + name + "'");
 					}
 				}
+				/* 检查别名循环 */
 				checkForAliasCircle(name, alias);
 				this.aliasMap.put(alias, name);
 				if (logger.isTraceEnabled()) {
@@ -120,6 +139,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		return this.aliasMap.containsKey(name);
 	}
 
+	/* 获取规范名称对应的别名列表，通过value查找key列表 */
 	@Override
 	public String[] getAliases(String name) {
 		List<String> result = new ArrayList<>();
@@ -149,6 +169,11 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * <p>The value resolver may for example resolve placeholders
 	 * in target bean names and even in alias names.
 	 * @param valueResolver the StringValueResolver to apply
+	 */
+	/**
+	 * 使用给定的{@link StringValueResolver}解析所有在此注册表中注册的别名目标名称和别名。
+	 * 例如，值解析器可以解析目标bean名称甚至别名中的占位符。
+	 * @param valueResolver 要应用的StringValueResolver
 	 */
 	public void resolveAliases(StringValueResolver valueResolver) {
 		Assert.notNull(valueResolver, "StringValueResolver must not be null");
