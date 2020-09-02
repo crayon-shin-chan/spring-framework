@@ -75,6 +75,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	volatile Class<?> resolvedTargetType;
 
 	/** Package-visible field for caching if the bean is a factory bean. */
+	/** 如果bean是工厂bean，则为软件包可见的字段用于缓存。 */
 	@Nullable
 	volatile Boolean isFactoryBean;
 

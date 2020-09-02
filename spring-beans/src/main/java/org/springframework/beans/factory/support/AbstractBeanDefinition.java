@@ -295,6 +295,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * in the given bean definition.
 	 * </ul>
 	 */
+	/**
+	 * 覆盖给定bean定义（可能是孩子）中此bean定义（可能是从父子继承关系中复制的parent）中的设置。
+	 * 如果在给定的bean定义中指定，将覆盖beanClass。
+	 * 将始终从给定的bean定义中获取{@code abstract}，{@code scope}，{@code lazyInit}，{@code autowireMode}，{@codedependencyCheck}，和{@codedependsOn} 。
+	 * 将从给定的bean定义中添加{@code constructorArgumentValues}，{@code propertyValues}，{@code methodOverrides}。
+	 * 如果在给定的bean定义中指定，将覆盖{@code factoryBeanName}，{@code factoryMethodName}，{@code initMethodName}和{@code destroyMethodName}。
+	 * @param other
+	 */
 	public void overrideFrom(BeanDefinition other) {
 		if (StringUtils.hasLength(other.getBeanClassName())) {
 			setBeanClassName(other.getBeanClassName());

@@ -39,6 +39,15 @@ import org.springframework.lang.Nullable;
  * @since 03.11.2003
  * @see org.springframework.context.support.AbstractApplicationContext#getBeanFactory()
  */
+
+/**
+ * 大多数可列出的bean工厂都将实现配置接口。
+ * 除了{@link ConfigurableBeanFactory}外，它还提供了用于分析和修改bean定义以及预先实例化单例的工具。
+ * {@link org.springframework.beans.factory.BeanFactory}的此子接口不打算在常规应用程序代码中使用：
+ * 坚持使用{@link org.springframework.beans.factory.BeanFactory}或典型情况下的{@link org.springframework.beans.factory.ListableBeanFactory}。
+ * 即使需要访问bean工厂配置方法，该接口也仅允许框架内部即插即用。
+ * @see org.springframework.context.support.AbstractApplicationContext＃getBeanFactory（）
+ */
 public interface ConfigurableListableBeanFactory
 		extends ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory {
 
@@ -46,6 +55,10 @@ public interface ConfigurableListableBeanFactory
 	 * Ignore the given dependency type for autowiring:
 	 * for example, String. Default is none.
 	 * @param type the dependency type to ignore
+	 */
+	/**
+	 * 忽略给定的依赖类型进行自动装配：例如，字符串。默认为无。
+	 * @param type 忽略的依赖类型
 	 */
 	void ignoreDependencyType(Class<?> type);
 
@@ -57,6 +70,14 @@ public interface ConfigurableListableBeanFactory
 	 * <p>By default, only the BeanFactoryAware interface is ignored.
 	 * For further types to ignore, invoke this method for each type.
 	 * @param ifc the dependency interface to ignore
+	 * @see org.springframework.beans.factory.BeanFactoryAware
+	 * @see org.springframework.context.ApplicationContextAware
+	 */
+	/**
+	 * 忽略给定的依赖接口进行自动装配。
+	 * 通常由应用程序上下文用来注册以其他方式解析的依赖项，例如通过BeanFactoryAware通过BeanFactory或通过ApplicationContextAware通过ApplicationContext进行解析。
+	 * 默认情况下，仅BeanFactoryAware接口被忽略。要忽略其他类型，请为每种类型调用此方法。
+	 * @param ifc 忽略的依赖关系接口
 	 * @see org.springframework.beans.factory.BeanFactoryAware
 	 * @see org.springframework.context.ApplicationContextAware
 	 */
@@ -78,6 +99,14 @@ public interface ConfigurableListableBeanFactory
 	 * implementation of the {@link org.springframework.beans.factory.ObjectFactory}
 	 * interface, which allows for lazy resolution of the actual target value.
 	 */
+	/**
+	 * 用相应的自动装配值注册一个特殊的依赖类型。
+	 * 这是用于工厂/上下文引用的，这些引用应该是可自动编写的，但在工厂中未定义为bean：
+	 * 解析为bean所在的ApplicationContext实例的ApplicationContext类型的依赖项。
+	 * 注意：在普通BeanFactory中没有注册这样的默认类型，甚至对于BeanFactory接口本身也没有。
+	 * @param dependencyType 要注册的依赖类型。只要给定值实际上实现了扩展接口，它通常将是一个基本接口，例如BeanFactory，并且扩展名也将被解析为如果声明为自动装配依赖项（例如ListableBeanFactory），则是。
+	 * @param autowiredValue 对应的自动装配值。这也可以是{@link org.springframework.beans.factory.ObjectFactory}接口的一个实现，该接口允许延迟解析实际目标值。
+	 */
 	void registerResolvableDependency(Class<?> dependencyType, @Nullable Object autowiredValue);
 
 	/**
@@ -88,6 +117,14 @@ public interface ConfigurableListableBeanFactory
 	 * @param descriptor the descriptor of the dependency to resolve
 	 * @return whether the bean should be considered as autowire candidate
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
+	 */
+	/**
+	 * 确定指定的bean是否符合自动装配候选条件，可以注入到声明匹配类型依赖项的其他bean中。
+	 * 此方法也检查祖先工厂。
+	 * @param beanName 要检查的bean的名称
+	 * @param descriptor 要解析的依赖项的描述符
+	 * @return 是否应将bean视为自动装配候选
+	 * @throws NoSuchBeanDefinitionException 如果没有给定名称的bean
 	 */
 	boolean isAutowireCandidate(String beanName, DependencyDescriptor descriptor)
 			throws NoSuchBeanDefinitionException;
@@ -106,6 +143,15 @@ public interface ConfigurableListableBeanFactory
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
 	 * defined in this factory
 	 */
+	/**
+	 * 返回指定Bean的注册BeanDefinition，从而允许对其属性值和构造函数参数值进行访问（可以在Bean工厂后处理期间进行修改）。
+	 * 返回的BeanDefinition对象不应是副本，而应是工厂中注册的原始定义对象。
+	 * 这意味着，如有必要，应该可以强制转换为更具体的实现类型。
+	 * 注意：此方法考虑祖先工厂。 仅用于访问该工厂的本地bean定义。
+	 * @param beanName bean的名称
+	 * @return 注册的BeanDefinition
+	 * @throws NoSuchBeanDefinitionException 如果工厂中没有给定名称的bean
+	 */
 	BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
 
 	/**
@@ -115,6 +161,15 @@ public interface ConfigurableListableBeanFactory
 	 * analogous to how type/annotation specific retrieval of bean names works.
 	 * @return the composite iterator for the bean names view
 	 * @since 4.1.2
+	 * @see #containsBeanDefinition
+	 * @see #registerSingleton
+	 * @see #getBeanNamesForType
+	 * @see #getBeanNamesForAnnotation
+	 */
+	/**
+	 * 返回对此工厂管理的所有bean名称的统一视图。
+	 * 包括Bean定义名称以及手动注册的单例实例的名称，并且始终以Bean定义名称排在第一位，类似于特定于类型/注释的Bean名称检索的工作方式。
+	 * @return bean名称视图的复合迭代器
 	 * @see #containsBeanDefinition
 	 * @see #registerSingleton
 	 * @see #getBeanNamesForType
@@ -132,6 +187,13 @@ public interface ConfigurableListableBeanFactory
 	 * @see #getBeanDefinition
 	 * @see #getMergedBeanDefinition
 	 */
+	/**
+	 * 清除合并的bean定义缓存，删除bean的条目，这些条目尚不适合进行完整的元数据缓存。
+	 * 通常在更改原始bean定义后触发，例如在应用{@link BeanFactoryPostProcessor}之后。
+	 * 请注意，此时将保留已创建的bean的元数据。
+	 * @see #getBeanDefinition
+	 * @see #getMergedBeanDefinition
+	 */
 	void clearMetadataCache();
 
 	/**
@@ -139,12 +201,20 @@ public interface ConfigurableListableBeanFactory
 	 * will not be modified or post-processed any further.
 	 * <p>This allows the factory to aggressively cache bean definition metadata.
 	 */
+	/**
+	 * 冻结所有bean定义，表示已注册的bean定义不会再被修改或后处理。
+	 * 这允许工厂积极地缓存bean定义元数据。
+	 */
 	void freezeConfiguration();
 
 	/**
 	 * Return whether this factory's bean definitions are frozen,
 	 * i.e. are not supposed to be modified or post-processed any further.
 	 * @return {@code true} if the factory's configuration is considered frozen
+	 */
+	/**
+	 * 返回此工厂的Bean定义是否被冻结，即不应被修改或进一步处理。
+	 * @return {@code true}（如果认为出厂配置已冻结）
 	 */
 	boolean isConfigurationFrozen();
 
@@ -156,6 +226,14 @@ public interface ConfigurableListableBeanFactory
 	 * Note: This may have left the factory with some beans already initialized!
 	 * Call {@link #destroySingletons()} for full cleanup in this case.
 	 * @see #destroySingletons()
+	 */
+	/**
+	 * 确保所有非延迟初始化单例都实例化，同时考虑{@link org.springframework.beans.factory.FactoryBean}。
+	 * 如果需要，通常在出厂设置结束时调用。
+	 * @throws BeansException 如果无法创建一个单例bean。
+	 * 注意：这可能已经离开工厂，并且已经初始化了一些bean！
+	 * 在这种情况下，请致电{@link #destroySingletons（）}进行全面清理。
+	 * @see #destroySingletons（）
 	 */
 	void preInstantiateSingletons() throws BeansException;
 
