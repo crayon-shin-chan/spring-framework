@@ -42,10 +42,10 @@ import org.springframework.util.StringValueResolver;
  */
 
 /**
- * {@link AliasRegistry}接口的简单实现。 
+ * {@link AliasRegistry}接口的简单实现。
  * 用作{@link org.springframework.beans.factory.support.BeanDefinitionRegistry}实现的基类。
  */
-public class SimpleAliasRegistry implements AliasRegistry {
+public class  SimpleAliasRegistry implements AliasRegistry {
 
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -231,11 +231,17 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * @param name the user-specified name
 	 * @return the transformed name
 	 */
+	/**
+	 * 确定原始名称，将别名解析为规范名称。
+	 * @param name 用户指定的名称
+	 * @return 转​​换后的名称
+	 */
 	public String canonicalName(String name) {
 		String canonicalName = name;
 		// Handle aliasing...
 		String resolvedName;
 		do {
+			/* 如果是别名，获取其违反名称 */
 			resolvedName = this.aliasMap.get(canonicalName);
 			if (resolvedName != null) {
 				canonicalName = resolvedName;
