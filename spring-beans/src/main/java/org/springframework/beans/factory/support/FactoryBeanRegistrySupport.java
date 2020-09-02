@@ -41,9 +41,17 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 2.5.1
  */
+
+/**
+ * 支持单例注册表的基类，该单例注册表需要处理{@link org.springframework.beans.factory.FactoryBean}实例，并与{@link DefaultSingletonBeanRegistry}的单例管理集成在一起。
+ * 用作{@link AbstractBeanFactory}的基类。
+ */
 public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanRegistry {
 
 	/** Cache of singleton objects created by FactoryBeans: FactoryBean name to object. */
+	/**
+	 * 由FactoryBean创建的单例对象的缓存：对象的FactoryBean名称。
+	 */
 	private final Map<String, Object> factoryBeanObjectCache = new ConcurrentHashMap<>(16);
 
 
@@ -52,6 +60,11 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @param factoryBean the FactoryBean instance to check
 	 * @return the FactoryBean's object type,
 	 * or {@code null} if the type cannot be determined yet
+	 */
+	/**
+	 * 确定给定FactoryBean的类型。
+	 * @param factoryBean 要检查的FactoryBean实例
+	 * @return FactoryBean的对象类型，或者如果尚未确定类型，则返回{@code null}
 	 */
 	@Nullable
 	protected Class<?> getTypeForFactoryBean(FactoryBean<?> factoryBean) {
@@ -79,6 +92,12 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @return the object obtained from the FactoryBean,
 	 * or {@code null} if not available
 	 */
+	/**
+	 * 如果有，以缓存形式从给定的FactoryBean获取要暴露的对象。
+	 * 快速检查最小同步。
+	 * @param beanName bean的名称
+	 * @return 从FactoryBean获得的对象，如果没有，则返回*或{@code null}
+	 */
 	@Nullable
 	protected Object getCachedObjectForFactoryBean(String beanName) {
 		return this.factoryBeanObjectCache.get(beanName);
@@ -93,6 +112,15 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @throws BeanCreationException if FactoryBean object creation failed
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
+	/**
+	 * 获取一个对象以从给定的FactoryBean中公开。
+	 * @param factory 实例的工厂
+	 * @param beanName Bean的名称
+	 * @param shouldPostProcess Bean是否要进行后处理
+	 * @return 从FactoryBean获得的对象
+	 * 如果FactoryBean对象创建失败，则抛出BeanCreationException
+	 * @see org.springframework.beans.factory.FactoryBean＃getObject（）
+	 */
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
 		if (factory.isSingleton() && containsSingleton(beanName)) {
 			synchronized (getSingletonMutex()) {
@@ -101,6 +129,9 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 					object = doGetObjectFromFactoryBean(factory, beanName);
 					// Only post-process and store if not put there already during getObject() call above
 					// (e.g. because of circular reference processing triggered by custom getBean calls)
+					/**
+					 * 仅对上面的getObject（）调用期间进行后处理和存储（如果尚未存储）（例如，由于自定义getBean调用触发了循环引用处理）
+					 */
 					Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
 					if (alreadyThere != null) {
 						object = alreadyThere;
