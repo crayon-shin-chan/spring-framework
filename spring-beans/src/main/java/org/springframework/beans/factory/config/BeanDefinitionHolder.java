@@ -37,12 +37,22 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
  */
+/**
+ * 具有名称和别名的BeanDefinition的持有人。
+ * 可以注册为内部bean的占位符。
+ * 也可以用于内部bean定义的编程注册。
+ * 如果您不关心BeanNameAware之类的东西，那么注册RootBeanDefinition或ChildBeanDefinition就足够了。
+ * @see org.springframework.beans.factory.BeanNameAware
+ * @see org.springframework.beans.factory.support.RootBeanDefinition
+ * @see org.springframework.beans.factory.support .ChildBeanDefinition
+ */
 public class BeanDefinitionHolder implements BeanMetadataElement {
 
+	/* bean定义 */
 	private final BeanDefinition beanDefinition;
-
+	/* bean名称 */
 	private final String beanName;
-
+	/* 别名 */
 	@Nullable
 	private final String[] aliases;
 
