@@ -29,11 +29,19 @@ package org.springframework.core.type;
  * @see AnnotationMetadata#getAnnotatedMethods
  * @see AnnotatedTypeMetadata
  */
+
+/**
+ * 该接口定义了对特定类的批注的抽象访问，其格式尚不要求加载该类。
+ * @see StandardMethodMetadata
+ * @see AnnotationMetadata＃getAnnotatedMethods
+ * @see AnnotatedTypeMetadata
+ */
 public interface MethodMetadata extends AnnotatedTypeMetadata {
 
 	/**
 	 * Return the name of the method.
 	 */
+	/* 方法名称 */
 	String getMethodName();
 
 	/**
@@ -45,6 +53,7 @@ public interface MethodMetadata extends AnnotatedTypeMetadata {
 	 * Return the fully-qualified name of this method's declared return type.
 	 * @since 4.2
 	 */
+	/* 返回类型名称 */
 	String getReturnTypeName();
 
 	/**
