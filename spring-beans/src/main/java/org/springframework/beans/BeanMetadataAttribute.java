@@ -27,10 +27,17 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
+
+/**
+ * 属于Bean定义的键值样式属性的持有人。
+ * 除了键值对之外，还跟踪定义源。
+ */
 public class BeanMetadataAttribute implements BeanMetadataElement {
 
+	/* 属性名 */
 	private final String name;
 
+	/* 属性值 */
 	@Nullable
 	private final Object value;
 

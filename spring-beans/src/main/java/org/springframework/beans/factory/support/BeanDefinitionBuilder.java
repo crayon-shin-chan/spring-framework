@@ -235,7 +235,13 @@ public final class BeanDefinitionBuilder {
 	 * @since 5.2
 	 * @see AutowiredPropertyMarker
 	 */
+	/**
+	 * 在指定的bean上为指定的属性添加自动连接的标记。
+	 * @param name 标记为自动装配的属性的名称
+	 * @see AutowiredPropertyMarker
+	 */
 	public BeanDefinitionBuilder addAutowiredProperty(String name) {
+		/** 自动装配的属性值为{@link AutowiredPropertyMarker.INSTANCE}  */
 		this.beanDefinition.getPropertyValues().add(name, AutowiredPropertyMarker.INSTANCE);
 		return this;
 	}

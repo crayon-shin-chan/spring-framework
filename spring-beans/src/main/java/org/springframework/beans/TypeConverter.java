@@ -35,6 +35,14 @@ import org.springframework.lang.Nullable;
  * @see SimpleTypeConverter
  * @see BeanWrapperImpl
  */
+
+/**
+ * 定义类型转换方法的接口。
+ * 通常（但不是必须）与{@link PropertyEditorRegistry}接口一起实现。
+ * 注意：由于TypeConverter实现通常基于{@link java.beans.PropertyEditor}，它们不是线程安全的，因此TypeConverters本身不是被视为线程安全的。
+ * @see SimpleTypeConverter
+ * @see BeanWrapperImpl * /
+ */
 public interface TypeConverter {
 
 	/**
@@ -48,6 +56,18 @@ public interface TypeConverter {
 	 * @throws TypeMismatchException if type conversion failed
 	 * @see java.beans.PropertyEditor#setAsText(String)
 	 * @see java.beans.PropertyEditor#getValue()
+	 * @see org.springframework.core.convert.ConversionService
+	 * @see org.springframework.core.convert.converter.Converter
+	 */
+	/**
+	 * 将值转换为所需的类型（如果需要，则从字符串）。
+	 * 从String到任何类型的转换通常将使用PropertyEditor类的{@code setAsText}方法或ConversionService中的Spring Converter。
+	 * @param value 要转换的值
+	 * @param requiredType 我们必须转换为的类型（或者，如果未知，则为{@code null}，例如在一个collection元素的情况下）
+	 * @return 新值，可能是类型转换
+	 * @throws TypeMismatchException 如果类型转换失败，则抛出TypeMismatchException
+	 * @see java.beans.PropertyEditor＃setAsText（String）
+	 * @see java.beans.PropertyEditor＃getValue（）
 	 * @see org.springframework.core.convert.ConversionService
 	 * @see org.springframework.core.convert.converter.Converter
 	 */
@@ -67,6 +87,19 @@ public interface TypeConverter {
 	 * @throws TypeMismatchException if type conversion failed
 	 * @see java.beans.PropertyEditor#setAsText(String)
 	 * @see java.beans.PropertyEditor#getValue()
+	 * @see org.springframework.core.convert.ConversionService
+	 * @see org.springframework.core.convert.converter.Converter
+	 */
+	/**
+	 * 将值转换为所需的类型（如果需要，则从字符串）。
+	 * 从String到任何类型的转换通常将使用PropertyEditor类的{@code setAsText}方法或ConversionService中的Spring Converter。
+	 * @param value 要转换的值
+	 * @param requiredType 我们必须转换为的类型（如果未知，例如，如果是集合元素，则为{@code null}）
+	 * @param methodParam 作为目标的方法参数转换的时间（用于分析通用类型；可能为{@code null}）
+	 * @return 新值，可能是类型转换的结果
+	 * @throws TypeMismatchException 如果类型转换失败，则抛出TypeMismatchException
+	 * @see java.beans.PropertyEditor＃setAsText （字符串）
+	 * @see java.beans.PropertyEditor＃getValue（）
 	 * @see org.springframework.core.convert.ConversionService
 	 * @see org.springframework.core.convert.converter.Converter
 	 */
@@ -90,6 +123,19 @@ public interface TypeConverter {
 	 * @see org.springframework.core.convert.ConversionService
 	 * @see org.springframework.core.convert.converter.Converter
 	 */
+	/**
+	 * 将值转换为所需的类型（如果需要，则从字符串）。
+	 * 从String到任何类型的转换通常将使用PropertyEditor类的{@code setAsText}方法或ConversionService中的Spring Converter。
+	 * @param value 要转换的值
+	 * @param requiredType 我们必须转换为的类型（如果未知，则为{@code null}，例如在收集元素的情况下
+	 * @param field 作为目标的反射场的转换（用于分析通用类型；可能为{@code null}）
+	 * @return 新值，可能是类型转换的结果*
+	 * @throws TypeMismatchException 如果类型转换失败，则抛出TypeMismatchException
+	 * @see java.beans.PropertyEditor＃setAsText （字符串）
+	 * @see java.beans.PropertyEditor＃getValue（）
+	 * @see org.springframework.core.convert.ConversionService
+	 * @see org.springframework.core.convert.converter.Converter
+	 */
 	@Nullable
 	<T> T convertIfNecessary(@Nullable Object value, @Nullable Class<T> requiredType, @Nullable Field field)
 			throws TypeMismatchException;
@@ -107,6 +153,19 @@ public interface TypeConverter {
 	 * @since 5.1.4
 	 * @see java.beans.PropertyEditor#setAsText(String)
 	 * @see java.beans.PropertyEditor#getValue()
+	 * @see org.springframework.core.convert.ConversionService
+	 * @see org.springframework.core.convert.converter.Converter
+	 */
+	/**
+	 * 将值转换为所需的类型（如果需要，则从字符串）。
+	 * 从String到任何类型的转换通常将使用PropertyEditor类的{@code setAsText}方法或ConversionService中的Spring Converter。
+	 * @param value 要转换的值
+	 * @param requiredType 我们必须转换为的类型（或者，如果未知，则为{@code null}，例如在收集元素的情况下）
+	 * @param typeDescriptor 或要使用的类型描述符是{@code null}））
+	 * @return 新值，可能是类型转换的结果*
+	 * @throws TypeMismatchException 如果类型转换失败，则抛出TypeMismatchException
+	 * @see java.beans.PropertyEditor＃setAsText（String）
+	 * @see java.beans.PropertyEditor＃getValue（）
 	 * @see org.springframework.core.convert.ConversionService
 	 * @see org.springframework.core.convert.converter.Converter
 	 */

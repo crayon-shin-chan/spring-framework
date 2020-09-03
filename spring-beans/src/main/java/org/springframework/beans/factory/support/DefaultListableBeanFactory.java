@@ -1264,15 +1264,26 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return null;
 	}
 
+	/**
+	 * 解析{@link DependencyDescriptor}，代表了一个自动注入依赖的描述
+	 * @param descriptor 依赖项的描述符（字段/方法/构造函数）
+	 * @param requestingBeanName 声明给定依赖项的bean的名
+	 * @param autowiredBeanNames 一个设置为所有自动装配的bean的名称（用于解决给定的依赖项） ）应该添加到
+	 * @param typeConverter TypeConverter中，以用于填充数组和集合
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	@Nullable
 	public Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName,
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
 
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
+		/** 依赖为{@link Optional}类型 */
 		if (Optional.class == descriptor.getDependencyType()) {
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
+		/** 依赖为{@link ObjectFactory}类型 */
 		else if (ObjectFactory.class == descriptor.getDependencyType() ||
 				ObjectProvider.class == descriptor.getDependencyType()) {
 			return new DependencyObjectProvider(descriptor, requestingBeanName);

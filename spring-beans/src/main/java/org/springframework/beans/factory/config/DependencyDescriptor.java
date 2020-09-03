@@ -49,28 +49,34 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
+
+/**
+ * 即将注入的特定依赖项的描述符。
+ * 包装构造函数参数，方法参数或字段，允许统一访问其元数据。
+ */
 @SuppressWarnings("serial")
 public class DependencyDescriptor extends InjectionPoint implements Serializable {
 
+	/* 声明类 */
 	private final Class<?> declaringClass;
-
+	/* 方法名称 */
 	@Nullable
 	private String methodName;
-
+	/* 参数类型 */
 	@Nullable
 	private Class<?>[] parameterTypes;
-
+	/* 参数索引 */
 	private int parameterIndex;
-
+	/* 字段名称 */
 	@Nullable
 	private String fieldName;
-
+	/* 是否必须 */
 	private final boolean required;
-
+	/* 是否急切 */
 	private final boolean eager;
 
 	private int nestingLevel = 1;
-
+	/* 包含类 */
 	@Nullable
 	private Class<?> containingClass;
 

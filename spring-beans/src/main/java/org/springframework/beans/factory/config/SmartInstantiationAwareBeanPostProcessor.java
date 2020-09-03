@@ -59,6 +59,14 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	 * @return the candidate constructors, or {@code null} if none specified
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 */
+	/**
+	 * 确定要用于给定bean的候选构造函数。
+	 * 默认实现返回{@code null}。
+	 * @param beanClass Bean的原始类（不要{@code null}）
+	 * @param beanName Bean的名称
+	 * @return 候选构造函数，如果未指定则返回{@code null}
+	 * @throws org.springframework。发生错误时的beans.BeansException
+	 */
 	@Nullable
 	default Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName)
 			throws BeansException {

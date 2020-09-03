@@ -34,6 +34,11 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 2.0
  */
+
+/**
+ * {@link AttributeAccessor}的支持类，提供所有方法的基本实现。
+ * 由子类扩展。 {@link Serializable}，如果子类和所有属性值都是{@link Serializable}。
+ */
 @SuppressWarnings("serial")
 public abstract class AttributeAccessorSupport implements AttributeAccessor, Serializable {
 

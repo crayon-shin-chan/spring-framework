@@ -36,6 +36,7 @@ public class RuntimeBeanReference implements BeanReference {
 	@Nullable
 	private final Class<?> beanType;
 
+	/* 返回这是否是对父工厂中bean的显式引用。 */
 	private final boolean toParent;
 
 	@Nullable
@@ -110,6 +111,10 @@ public class RuntimeBeanReference implements BeanReference {
 
 	/**
 	 * Return whether this is an explicit reference to a bean in the parent factory.
+	 */
+	/**
+	 * 返回这是否是对父工厂中bean的显式引用。
+	 * @return
 	 */
 	public boolean isToParent() {
 		return this.toParent;

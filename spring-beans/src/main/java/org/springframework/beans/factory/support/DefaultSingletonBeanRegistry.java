@@ -502,7 +502,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/**
 	 * 在给定的bean被销毁之前，为给定的bean注册一个要被销毁的依赖bean。
 	 * @param beanName bean的名称
-	 * @param dependentBeanName 从属bean的名称
+	 * @param dependentBeanName 从属bean的名称，即依赖于上面bean
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
 		String canonicalName = canonicalName(beanName);

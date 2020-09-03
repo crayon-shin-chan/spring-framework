@@ -58,15 +58,23 @@ import org.springframework.util.ObjectUtils;
  * @since 2.0
  * @see org.springframework.core.annotation.SynthesizingMethodParameter
  */
+
+/**
+ * 封装方法参数规范的帮助程序类，即{@link Method}或{@link Constructor}以及已声明的泛型类型的参数索引和嵌套类型索引。
+ * 用作传递的规范对象。
+ * 从4.2开始，有一个{@link org.springframework.core.annotation.SynthesizingMethodParameter}子类可用，该子类可以合成带有属性别名的注释。
+ * 该子类尤其用于Web和消息终结点处理。
+ * @see org.springframework.core.annotation.SynthesizingMethodParameter
+ */
 public class MethodParameter {
 
 	private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
-
+	/* 可执行方法，构造函数或者普通方法 */
 	private final Executable executable;
-
+	/* 参数索引，如setter方法中的参数索引为0 */
 	private final int parameterIndex;
-
+	/* 参数对象 */
 	@Nullable
 	private volatile Parameter parameter;
 
@@ -77,24 +85,25 @@ public class MethodParameter {
 	Map<Integer, Integer> typeIndexesPerLevel;
 
 	/** The containing class. Could also be supplied by overriding {@link #getContainingClass()} */
+	/** 包含的类。也可以通过覆盖{@link #getContainingClass（）}来提供 */
 	@Nullable
 	private volatile Class<?> containingClass;
-
+	/* 参数类型 */
 	@Nullable
 	private volatile Class<?> parameterType;
-
+	/* 泛型参数类型 */
 	@Nullable
 	private volatile Type genericParameterType;
-
+	/* 参数注解 */
 	@Nullable
 	private volatile Annotation[] parameterAnnotations;
 
 	@Nullable
 	private volatile ParameterNameDiscoverer parameterNameDiscoverer;
-
+	/* 参数名称 */
 	@Nullable
 	private volatile String parameterName;
-
+	/* 内嵌方法参数 */
 	@Nullable
 	private volatile MethodParameter nestedMethodParameter;
 

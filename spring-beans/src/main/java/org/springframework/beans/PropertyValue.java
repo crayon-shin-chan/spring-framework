@@ -39,26 +39,34 @@ import org.springframework.util.ObjectUtils;
  * @see PropertyValues
  * @see BeanWrapper
  */
+
+/**
+ * 持有单个bean属性的信息和值的对象。
+ * 在这里使用对象，而不是仅将所有属性存储在以属性名称为键的映射中，这样可以提供更大的灵活性，并且可以以优化的方式处理索引属性等。
+ * 请注意，该值不必是最终所需的类型：{@link BeanWrapper}实现应处理任何必要的转换，因为此对象对将要应用的对象一无所知至。
+ */
 @SuppressWarnings("serial")
 public class PropertyValue extends BeanMetadataAttributeAccessor implements Serializable {
 
+	/* 属性名 */
 	private final String name;
 
+	/* 属性值 */
 	@Nullable
 	private final Object value;
-
+	/* 是否可选 */
 	private boolean optional = false;
-
+	/* 是否已转换，bean定义中如xml中只能配置字符串，真实值需要转换 */
 	private boolean converted = false;
-
+	/* 转换后的值 */
 	@Nullable
 	private Object convertedValue;
 
-	/** Package-visible field that indicates whether conversion is necessary. */
+	/** 指示是否需要转换。. */
 	@Nullable
 	volatile Boolean conversionNecessary;
 
-	/** Package-visible field for caching the resolved property path tokens. */
+	/** 用于缓存已解析的属性路径标记。 */
 	@Nullable
 	transient volatile Object resolvedTokens;
 
@@ -171,6 +179,10 @@ public class PropertyValue extends BeanMetadataAttributeAccessor implements Seri
 	/**
 	 * Set the converted value of this property value,
 	 * after processed type conversion.
+	 */
+	/**
+	 * 处理类型转换后，设置此属性值的转换值*。
+	 * @param value
 	 */
 	public synchronized void setConvertedValue(@Nullable Object value) {
 		this.converted = true;

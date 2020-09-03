@@ -103,10 +103,18 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Constant that indicates no dependency check at all.
 	 * @see #setDependencyCheck
 	 */
+	/**
+	 * 表示根本没有依赖项检查的常数。
+	 * @see #setDependencyCheck
+	 */
 	public static final int DEPENDENCY_CHECK_NONE = 0;
 
 	/**
 	 * Constant that indicates dependency checking for object references.
+	 * @see #setDependencyCheck
+	 */
+	/**
+	 * 指示对对象引用进行依赖性检查的常数。
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_OBJECTS = 1;
@@ -116,11 +124,20 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #setDependencyCheck
 	 * @see org.springframework.beans.BeanUtils#isSimpleProperty
 	 */
+	/**
+	 * 指示对“简单”属性进行依赖性检查的常数。
+	 * @see #setDependencyCheck
+	 * @see org.springframework.beans.BeanUtils#isSimpleProperty
+	 */
 	public static final int DEPENDENCY_CHECK_SIMPLE = 2;
 
 	/**
 	 * Constant that indicates dependency checking for all properties
 	 * (object references as well as "simple" properties).
+	 * @see #setDependencyCheck
+	 */
+	/**
+	 * 指示对所有属性进行依赖检查的常数（对象引用以及“简单”属性）。
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_ALL = 3;

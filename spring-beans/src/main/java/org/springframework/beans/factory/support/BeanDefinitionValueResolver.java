@@ -58,14 +58,22 @@ import org.springframework.util.StringUtils;
  * @since 1.2
  * @see AbstractAutowireCapableBeanFactory
  */
+
+/**
+ * 用于bean工厂实现的Helper类，将bean定义对象中包含的值解析为应用于目标bean实例的实际值。
+ * 在{@link AbstractBeanFactory}和普通的{@link org.springframework.beans.factory.config.BeanDefinition}对象上运行。
+ * 由{@link AbstractAutowireCapableBeanFactory}使用。
+ * @@see AbstractAutowireCapableBeanFactory
+ */
 class BeanDefinitionValueResolver {
 
 	private final AbstractAutowireCapableBeanFactory beanFactory;
 
+	/* bean名称 */
 	private final String beanName;
-
+	/* bean定义 */
 	private final BeanDefinition beanDefinition;
-
+	/* 类型转换器 */
 	private final TypeConverter typeConverter;
 
 
@@ -104,14 +112,29 @@ class BeanDefinitionValueResolver {
 	 * @param value the value object to resolve
 	 * @return the resolved object
 	 */
+	/**
+	 * 给定一个PropertyValue，返回一个值，如有必要，解析工厂中对其他bean的任何引用。
+	 * 值可以是：一个BeanDefinition，它导致创建相应的新bean实例。
+	 * 此类“内部bean”的单例标志和名称始终被忽略：内部bean是匿名原型。
+	 * 一个RuntimeBeanReference，必须解决。
+	 * 一个ManagedList。这是一个特殊的集合，其中可能包含RuntimeBeanReferences或需要解决的集合。
+	 * 一个ManagedSet。也可能包含RuntimeBeanReferences或需要解决的集合。
+	 * 一个ManagedMap。在这种情况下，该值可能是需要解析的RuntimeBeanReference或Collection。
+	 * 一个普通对象或{@code null}，在这种情况下，将其保留下来。
+	 * @param argName 为值定义的参数的名称
+	 * @param value 要解析的值对象
+	 * @return 已解析的对象
+	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
+		/** 我们必须检查每个值，以查看是否需要运行时引用才能解析另一个bean。 */
 		if (value instanceof RuntimeBeanReference) {
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			return resolveReference(argName, ref);
 		}
+		/** 解析{@link RuntimeBeanNameReference}运行时bean名称引用 */
 		else if (value instanceof RuntimeBeanNameReference) {
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			refName = String.valueOf(doEvaluate(refName));
@@ -121,6 +144,7 @@ class BeanDefinitionValueResolver {
 			}
 			return refName;
 		}
+		/** 解析bean定义持有 */
 		else if (value instanceof BeanDefinitionHolder) {
 			// Resolve BeanDefinitionHolder: contains BeanDefinition with name and aliases.
 			BeanDefinitionHolder bdHolder = (BeanDefinitionHolder) value;
@@ -133,11 +157,12 @@ class BeanDefinitionValueResolver {
 					ObjectUtils.getIdentityHexString(bd);
 			return resolveInnerBean(argName, innerBeanName, bd);
 		}
+		/** 解析{@link DependencyDescriptor}，代表了一个自动注入依赖的描述 */
 		else if (value instanceof DependencyDescriptor) {
 			Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
-			Object result = this.beanFactory.resolveDependency(
-					(DependencyDescriptor) value, this.beanName, autowiredBeanNames, this.typeConverter);
+			Object result = this.beanFactory.resolveDependency((DependencyDescriptor) value, this.beanName, autowiredBeanNames, this.typeConverter);
 			for (String autowiredBeanName : autowiredBeanNames) {
+				/* 注册bean的依赖关系 */
 				if (this.beanFactory.containsBean(autowiredBeanName)) {
 					this.beanFactory.registerDependentBean(autowiredBeanName, this.beanName);
 				}
@@ -298,11 +323,18 @@ class BeanDefinitionValueResolver {
 	/**
 	 * Resolve a reference to another bean in the factory.
 	 */
+	/**
+	 * 解析工厂中对另一个bean的引用。
+	 * @param argName：参数名称
+	 * @param ref：bean运行时引用
+	 * @return：返回解析后的bean
+	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
 			Object bean;
-			Class<?> beanType = ref.getBeanType();
+			Class<?> beanType = ref.getBeanType();//bean类型
+			/* 这是否是对父工厂中bean的显式引用。 */
 			if (ref.isToParent()) {
 				BeanFactory parent = this.beanFactory.getParentBeanFactory();
 				if (parent == null) {

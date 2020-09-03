@@ -37,14 +37,24 @@ import org.springframework.util.ObjectUtils;
  * @see UnsatisfiedDependencyException#getInjectionPoint()
  * @see org.springframework.beans.factory.config.DependencyDescriptor
  */
+
+/**
+ * 描述字段注入/方法注入/构造函数注入的位置
+ * 注入点的简单描述符，指向方法/构造函数参数或字段。
+ * 由{@link UnsatisfiedDependencyException}公开。
+ * 也可用作工厂方法的参数，对要求的注入点进行响应以构建自定义的bean实例。
+ * @see UnsatisfiedDependencyException＃getInjectionPoint（）*
+ * @see org.springframework.beans.factory.config.DependencyDescriptor
+ */
 public class InjectionPoint {
 
+	/* 方法参数 */
 	@Nullable
 	protected MethodParameter methodParameter;
-
+	/* 字段 */
 	@Nullable
 	protected Field field;
-
+	/* 注解数组 */
 	@Nullable
 	private volatile Annotation[] fieldAnnotations;
 

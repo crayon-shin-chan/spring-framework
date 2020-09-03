@@ -25,6 +25,10 @@ import org.springframework.lang.Nullable;
  * @author Rob Harrop
  * @since 2.0
  */
+/**
+ * 属性访问器接口
+ * 定义用于将元数据附加到任意对象或从任意对象访问的通用协定的接口。
+ */
 public interface AttributeAccessor {
 
 	/**
