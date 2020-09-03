@@ -117,10 +117,25 @@ import org.springframework.util.StringUtils;
  * @see #getBean
  * @see #resolveDependency
  */
+
+/**
+ * Spring的{@link ConfigurableListableBeanFactory}和{@link BeanDefinitionRegistry}接口的默认实现：一个成熟的bean工厂基于bean定义元数据，可通过后处理器进行扩展。
+ * 典型用法是在访问bean之前首先注册所有bean定义（可能从bean定义文件中读取）。
+ * 因此，按名称查找Bean在本地Bean定义表中是一种廉价的操作，对预解析的Bean定义元数据对象进行操作。
+ * 请注意，特定bean定义格式的读取器通常是独立实现的，而不是作为bean工厂的子类实现的：
+ * 例如，参见{@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}。
+ * 对于{@link org.springframework.beans.factory.ListableBeanFactory}接口的替代实现，请看一下{@link StaticListableBeanFactory}，它管理现有的bean实例，而不是基于它们创建新实例。
+ * 关于bean的定义。
+ * @see #registerBeanDefinition
+ * @see #addBeanPostProcessor
+ * @see #getBean
+ * @see #resolveDependency
+ */
 @SuppressWarnings("serial")
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
 		implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
 
+	/* java扩展注入类 */
 	@Nullable
 	private static Class<?> javaxInjectProviderClass;
 
@@ -137,24 +152,29 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 
 	/** Map from serialized id to factory instance. */
-	private static final Map<String, Reference<DefaultListableBeanFactory>> serializableFactories =
-			new ConcurrentHashMap<>(8);
+	/** 从序列化的ID映射到工厂实例。 */
+	private static final Map<String, Reference<DefaultListableBeanFactory>> serializableFactories = new ConcurrentHashMap<>(8);
 
 	/** Optional id for this factory, for serialization purposes. */
+	/* 此工厂的可选ID，用于序列化。 */
 	@Nullable
 	private String serializationId;
 
 	/** Whether to allow re-registration of a different definition with the same name. */
+	/* 是否允许重新注册具有相同名称的不同定义。 */
 	private boolean allowBeanDefinitionOverriding = true;
 
 	/** Whether to allow eager class loading even for lazy-init beans. */
+	/* 是否允许甚至对于延迟初始化的bean都急切加载类 */
 	private boolean allowEagerClassLoading = true;
 
 	/** Optional OrderComparator for dependency Lists and arrays. */
+	/* 依赖关系列表和数组的可选OrderComparator。 */
 	@Nullable
 	private Comparator<Object> dependencyComparator;
 
 	/** Resolver to use for checking if a bean definition is an autowire candidate. */
+	/* 用于检查bean定义是否为自动装配候选的解析程序。 */
 	private AutowireCandidateResolver autowireCandidateResolver = SimpleAutowireCandidateResolver.INSTANCE;
 
 	/** Map from dependency type to corresponding autowired value. */

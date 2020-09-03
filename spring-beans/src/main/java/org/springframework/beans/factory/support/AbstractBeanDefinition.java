@@ -55,6 +55,14 @@ import org.springframework.util.StringUtils;
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
  */
+
+/**
+ * 具体的，成熟的{@link BeanDefinition}类的基类，排除了{@link GenericBeanDefinition}，{@link RootBeanDefinition}和{@link ChildBeanDefinition}的通用属性。
+ * 自动装配常数与在{{link org.springframework.beans.factory.config.AutowireCapableBeanFactory}接口中定义的常数匹配。
+ * @see GenericBeanDefinition
+ * @see RootBeanDefinition
+ * @see ChildBeanDefinition * /
+ */
 @SuppressWarnings("serial")
 public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor
 		implements BeanDefinition, Cloneable {
@@ -63,10 +71,17 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Constant for the default scope name: {@code ""}, equivalent to singleton
 	 * status unless overridden from a parent bean definition (if applicable).
 	 */
+	/**
+	 * 缺省作用域名称的常量：{@code“”}，等同于单例*状态，除非从父bean定义中覆盖（如果适用）。
+	 */
 	public static final String SCOPE_DEFAULT = "";
 
 	/**
 	 * Constant that indicates no external autowiring at all.
+	 * @see #setAutowireMode
+	 */
+	/**
+	 * 表示根本没有外部自动装配的常数。
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_NO = AutowireCapableBeanFactory.AUTOWIRE_NO;
@@ -75,16 +90,28 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Constant that indicates autowiring bean properties by name.
 	 * @see #setAutowireMode
 	 */
+	/**
+	 * 通过名称指示自动装配bean属性的常数。
+	 * @see #setAutowireMode
+	 */
 	public static final int AUTOWIRE_BY_NAME = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;
 
 	/**
 	 * Constant that indicates autowiring bean properties by type.
 	 * @see #setAutowireMode
 	 */
+	/**
+	 * 指示按类型自动装配Bean属性的常数。
+	 * @see #setAutowireMode
+	 */
 	public static final int AUTOWIRE_BY_TYPE = AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE;
 
 	/**
 	 * Constant that indicates autowiring a constructor.
+	 * @see #setAutowireMode
+	 */
+	/**
+	 * 指示自动装配构造函数的常数。
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_CONSTRUCTOR = AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR;
@@ -95,6 +122,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #setAutowireMode
 	 * @deprecated as of Spring 3.0: If you are using mixed autowiring strategies,
 	 * use annotation-based autowiring for clearer demarcation of autowiring needs.
+	 */
+	/**
+	 * 指示通过内省bean类确定适当的自动装配策略的常数。
+	 * @see #setAutowireMode
+	 * @since Spring 3.0开始不推荐使用：如果您使用混合自动装配策略，请使用基于注释的自动装配来更清楚地划分自动装配需求。
 	 */
 	@Deprecated
 	public static final int AUTOWIRE_AUTODETECT = AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT;
@@ -152,71 +184,76 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * <p>Currently, the method names detected during destroy method inference
 	 * are "close" and "shutdown", if present on the specific bean class.
 	 */
+	/**
+	 * 指示容器应尝试推断bean的{@link #setDestroyMethodName destroy}方法名称的常量，而不是方法名称的显式指定。
+	 * 值{@value}专门用于在方法名称中包含否则为非法的字符，从而确保与具有相同名称的合法命名方法不存在冲突的可能性。
+	 * 当前，在销毁方法推断过程中检测到的方法名称为“关闭”和“关闭”（如果存在于特定的Bean类上）。
+	 */
 	public static final String INFER_METHOD = "(inferred)";
 
-
+	/* bean类型，可以是Class对象，也可以是类名 */
 	@Nullable
 	private volatile Object beanClass;
-
+	/* scope */
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
-
+	/* 是否抽象 */
 	private boolean abstractFlag = false;
-
+	/* 是否懒初始化 */
 	@Nullable
 	private Boolean lazyInit;
-
+	/* 自动装配模式 */
 	private int autowireMode = AUTOWIRE_NO;
-
+	/* 依赖检查模式 */
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
-
+	/* 依赖bean名称数组 */
 	@Nullable
 	private String[] dependsOn;
-
+	/* 是否为自动装配候选 */
 	private boolean autowireCandidate = true;
-
+	/* 是否为主要装配候选 */
 	private boolean primary = false;
-
+	/* 自动装配候选标识符 */
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
-
+	/* 实例供应商 */
 	@Nullable
 	private Supplier<?> instanceSupplier;
-
+	/* 是否允许访问非公有字段方法 */
 	private boolean nonPublicAccessAllowed = true;
-
+	/* 宽松的建设者决议 */
 	private boolean lenientConstructorResolution = true;
-
+	/* 工厂bean名称 */
 	@Nullable
 	private String factoryBeanName;
-
+	/* 工厂方法名称 */
 	@Nullable
 	private String factoryMethodName;
-
+	/* 注入构造函数参数值 */
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
-
+	/* 注入属性值 */
 	@Nullable
 	private MutablePropertyValues propertyValues;
-
+	/* 方法覆盖 */
 	private MethodOverrides methodOverrides = new MethodOverrides();
-
+	/* 初始化方法名称 */
 	@Nullable
 	private String initMethodName;
-
+	/* 销毁方法名称 */
 	@Nullable
 	private String destroyMethodName;
 
 	private boolean enforceInitMethod = true;
 
 	private boolean enforceDestroyMethod = true;
-
+	/* 合成的 */
 	private boolean synthetic = false;
-
+	/* 角色 */
 	private int role = BeanDefinition.ROLE_APPLICATION;
-
+	/* 描述 */
 	@Nullable
 	private String description;
-
+	/* bean定义来自的配置资源 */
 	@Nullable
 	private Resource resource;
 
@@ -389,6 +426,10 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @param defaults the default settings to apply
 	 * @since 2.5
 	 */
+	/**
+	 * 将提供的默认值应用于此bean。
+	 * @param defaults 应用默认设置
+	 */
 	public void applyDefaults(BeanDefinitionDefaults defaults) {
 		Boolean lazyInit = defaults.getLazyInit();
 		if (lazyInit != null) {
@@ -484,6 +525,13 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @param classLoader the ClassLoader to use for resolving a (potential) class name
 	 * @return the resolved bean class
 	 * @throws ClassNotFoundException if the class name could be resolved
+	 */
+	/**
+	 * 确定包装的bean的类，如有必要，从指定的类名解析它。
+	 * 使用已经解析的bean类调用时，还将从其名称中重新加载指定的类。
+	 * @param classLoader 用于解析（潜在）类名称的ClassLoader
+	 * @return 已解析的bean类
+	 * @throws ClassNotFoundException（如果可以解析类名）
 	 */
 	@Nullable
 	public Class<?> resolveBeanClass(@Nullable ClassLoader classLoader) throws ClassNotFoundException {
@@ -631,17 +679,30 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #AUTOWIRE_CONSTRUCTOR
 	 * @see #AUTOWIRE_BY_TYPE
 	 */
+	/**
+	 * 返回解析的自动装配码（将AUTOWIRE_AUTODETECT解析为AUTOWIRE_CONSTRUCTOR或AUTOWIRE_BY_TYPE）。
+	 * @see #AUTOWIRE_AUTODETECT
+	 * @see #AUTOWIRE_CONSTRUCTOR
+	 * @see #AUTOWIRE_BY_TYPE
+	 * @return
+	 */
 	public int getResolvedAutowireMode() {
+		/* 如果是自动发现类型 */
 		if (this.autowireMode == AUTOWIRE_AUTODETECT) {
 			// Work out whether to apply setter autowiring or constructor autowiring.
 			// If it has a no-arg constructor it's deemed to be setter autowiring,
 			// otherwise we'll try constructor autowiring.
+			/**
+			 * 定是应用setter自动装配还是构造函数自动装配。
+			 * 如果它具有无参数构造函数，则将其视为setter自动装配，否则，我们将尝试构造函数自动装配。
+			 */
 			Constructor<?>[] constructors = getBeanClass().getConstructors();
 			for (Constructor<?> constructor : constructors) {
 				if (constructor.getParameterCount() == 0) {
-					return AUTOWIRE_BY_TYPE;
+					return AUTOWIRE_BY_TYPE;//有无参构造函数，则使用类型setter装配
 				}
 			}
+			/* 没有无参构造函数，则使用构造函数装配 */
 			return AUTOWIRE_CONSTRUCTOR;
 		}
 		else {
@@ -676,6 +737,13 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * constructor arguments. This property should just be necessary for other kinds
 	 * of dependencies like statics (*ugh*) or database preparation on startup.
 	 */
+	/**
+	 * 置该bean依赖于初始化的bean的名称。
+	 * bean工厂将保证这些bean首先被初始化。
+	 * 请注意，依赖关系通常通过bean属性或构造函数参数表示。
+	 * 对于其他类型的依赖项（例如静态（* ugh *）或启动时的数据库准备），此属性仅是必需的
+	 * @param dependsOn
+	 */
 	@Override
 	public void setDependsOn(@Nullable String... dependsOn) {
 		this.dependsOn = dependsOn;
@@ -696,6 +764,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * It does not affect explicit references by name, which will get resolved even
 	 * if the specified bean is not marked as an autowire candidate. As a consequence,
 	 * autowiring by name will nevertheless inject a bean if the name matches.
+	 * @see #AUTOWIRE_BY_TYPE
+	 * @see #AUTOWIRE_BY_NAME
+	 */
+	/**
+	 * 设置此bean是否适合自动连接到其他bean。
+	 * 请注意，此标志旨在仅影响基于类型的自动装配。
+	 * 它不会影响名称的显式引用，即使指定的bean未标记为自动装配候选，它也将得到解析。
+	 * 结果，如果名称匹配，按名称自动装配仍会注入一个bean。
 	 * @see #AUTOWIRE_BY_TYPE
 	 * @see #AUTOWIRE_BY_NAME
 	 */
@@ -978,6 +1054,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @see #setInitMethodName
 	 * @see #applyDefaults
 	 */
+	/**
+	 * 指定配置的初始化方法是否为默认方法。
+	 * 对于本地指定的初始化方法，默认值为{@code true}，但对于默认设置节中的共享设置，则切换为{@code false}
+	 * （例如，{@code bean init-method}与{@code Bean的默认级别-XML级别），可能不适用于所有包含的Bean定义。
+	 * @see #setInitMethodName
+	 * @see #applyDefaults
+	 * @param enforceInitMethod
+	 */
 	public void setEnforceInitMethod(boolean enforceInitMethod) {
 		this.enforceInitMethod = enforceInitMethod;
 	}
@@ -1126,6 +1210,12 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * <p>Note that this method returns the immediate originator. Iterate through the
 	 * originator chain to find the original BeanDefinition as defined by the user.
 	 */
+	/**
+	 * 返回原始的BeanDefinition，如果没有，则返回{@code null}。
+	 * 允许检索修饰的bean定义（如果有）。
+	 * 请注意，此方法返回直接发起者。遍历originator链以查找用户定义的原始BeanDefinition。
+	 * @return
+	 */
 	@Override
 	@Nullable
 	public BeanDefinition getOriginatingBeanDefinition() {
@@ -1137,7 +1227,12 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * Validate this bean definition.
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
+	/**
+	 * 验证bean定义
+	 * @throws BeanDefinitionValidationException
+	 */
 	public void validate() throws BeanDefinitionValidationException {
+		/* 工厂方法不能与方法覆盖同时存在 */
 		if (hasMethodOverrides() && getFactoryMethodName() != null) {
 			throw new BeanDefinitionValidationException(
 					"Cannot combine factory method with container-generated method overrides: " +
@@ -1171,7 +1266,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @param mo the MethodOverride object to validate
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
+	/**
+	 * 验证并准备给定的方法重写。
+	 * 检查是否存在具有指定名称的方法，如果未找到，则将其标记为未重载。
+	 * @param mo 通过MethodOverride对象进行验证
+	 * @throws BeanDefinitionValidationException 如果验证失败，则抛出BeanDefinitionValidationException * /
+	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		/* 获取指定覆盖方法的数量 */
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
@@ -1180,6 +1282,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 		else if (count == 1) {
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
+			/* 将替代标记为未过载，以避免arg类型检查的开销。 */
 			mo.setOverloaded(false);
 		}
 	}
