@@ -52,43 +52,59 @@ import org.springframework.util.Assert;
  * @see GenericBeanDefinition
  * @see ChildBeanDefinition
  */
+/**
+ * 根bean定义表示合并的bean定义，该定义在运行时支持Spring BeanFactory中的特定bean。
+ * 它可能是由彼此继承的多个原始bean定义创建的，通常注册为{@link GenericBeanDefinition}。
+ * 根bean定义本质上是运行时的“统一” bean定义视图。
+ * 在配置阶段，根Bean定义也可以用于注册单个Bean定义。
+ * 但是，从Spring 2.5开始，以编程方式注册bean定义的首选方法是{@link GenericBeanDefinition}类。
+ * GenericBeanDefinition的优势在于它允许动态定义父依赖关系，而不是将角色“硬编码”为根bean定义。
+ * @see GenericBeanDefinition
+ * @see ChildBeanDefinition
+ */
 @SuppressWarnings("serial")
 public class RootBeanDefinition extends AbstractBeanDefinition {
 
+	/* bean定义持有者 */
 	@Nullable
 	private BeanDefinitionHolder decoratedDefinition;
-
+	/* 注解元素 */
 	@Nullable
 	private AnnotatedElement qualifiedElement;
 
 	/** Determines if the definition needs to be re-merged. */
+	/* 确定是否需要重新合并定义。 */
 	volatile boolean stale;
-
+	/* 允许缓存 */
 	boolean allowCaching = true;
-
+	/**/
 	boolean isFactoryMethodUnique;
 
 	@Nullable
 	volatile ResolvableType targetType;
 
 	/** Package-visible field for caching the determined Class of a given bean definition. */
+	/* 用于缓存给定bean定义的确定的Class。 */
 	@Nullable
 	volatile Class<?> resolvedTargetType;
 
 	/** Package-visible field for caching if the bean is a factory bean. */
-	/** 如果bean是工厂bean，则为软件包可见的字段用于缓存。 */
+	/** 如果bean是工厂bean。 */
 	@Nullable
 	volatile Boolean isFactoryBean;
 
 	/** Package-visible field for caching the return type of a generically typed factory method. */
+	/* 用于缓存通用类型的工厂方法的返回类型。 */
 	@Nullable
 	volatile ResolvableType factoryMethodReturnType;
 
 	/** Package-visible field for caching a unique factory method candidate for introspection. */
+	/* 用于缓存用于自省的唯一工厂方法候选对象。 */
 	@Nullable
 	volatile Method factoryMethodToIntrospect;
 
 	/** Common lock for the four constructor fields below. */
+	/* 以下四个构造函数字段的通用锁。 */
 	final Object constructorArgumentLock = new Object();
 
 	/** Package-visible field for caching the resolved constructor or factory method. */
@@ -101,17 +117,23 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments. */
+	/* 缓存完全解析的构造函数参数。 */
 	@Nullable
 	Object[] resolvedConstructorArguments;
 
 	/** Package-visible field for caching partly prepared constructor arguments. */
+	/* 缓存部分准备好的构造函数参数。 */
 	@Nullable
 	Object[] preparedConstructorArguments;
 
 	/** Common lock for the two post-processing fields below. */
+	/* 以下两个后处理字段的通用锁。 */
 	final Object postProcessingLock = new Object();
 
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied. */
+	/**
+	 * 表示已应用合并的Bean定义PostProcessor。{@link MergedBeanDefinitionPostProcessor}
+	 */
 	boolean postProcessed = false;
 
 	/** 程序包可见的字段，指示已启动实例化前的后处理器。
@@ -350,6 +372,14 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	 * @see #setTargetType(ResolvableType)
 	 * @see #setBeanClass(Class)
 	 * @see #setResolvedFactoryMethod(Method)
+	 */
+	/**
+	 * 从运行时缓存的类型信息或从配置时返回一个针对该bean定义的{@link ResolvableType}
+	 * {@link #setTargetType（ResolvableType）}或{@link #setBeanClass（Class）}，还考虑了已解决工厂方法定义。
+	 * @since 5.1
+	 * @see #setTargetType（ResolvableType）
+	 * @see #setBeanClass（Class）
+	 * @see #setResolvedFactoryMethod（Method）
 	 */
 	@Override
 	public ResolvableType getResolvableType() {
