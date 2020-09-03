@@ -29,6 +29,10 @@ import org.springframework.lang.Nullable;
  * @author Mark Fisher
  * @since 2.5
  */
+
+/**
+ * 用于确定特定bean定义是否符合特定依赖项的自动装配候选的策略接口
+ */
 public interface AutowireCandidateResolver {
 
 	/**
@@ -40,6 +44,14 @@ public interface AutowireCandidateResolver {
 	 * @param descriptor the descriptor for the target method parameter or field
 	 * @return whether the bean definition qualifies as autowire candidate
 	 * @see org.springframework.beans.factory.config.BeanDefinition#isAutowireCandidate()
+	 */
+	/**
+	 * 确定给定的b​​ean定义是否符合给定依赖项的自动装配候选。
+	 * 默认实现检查{@link org.springframework.beans.factory.config.BeanDefinition＃isAutowireCandidate（）}。
+	 * @param bdHolder bean定义，包括bean名称和别名
+	 * @param descriptor 目标方法参数或字段的描述符
+	 * @return bean定义是否符合自动装配候选条件
+	 * @see org.springframework.beans.factory.config.BeanDefinition #isAutowireCandidate（）
 	 */
 	default boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
 		return bdHolder.getBeanDefinition().isAutowireCandidate();
@@ -53,6 +65,13 @@ public interface AutowireCandidateResolver {
 	 * non-required status some other way (e.g. through a parameter annotation)
 	 * @since 5.0
 	 * @see DependencyDescriptor#isRequired()
+	 */
+	/**
+	 * 确定给定的描述符是否确实需要依赖。
+	 * 默认实现检查{@link DependencyDescriptor＃isRequired（）}。
+	 * @param descriptor 符目标方法参数或字段的描述符
+	 * @return 描述符是否标记为必需或可能指示不需要的状态（例如通过参数注释）
+	 * @see DependencyDescriptor＃是必须的（）
 	 */
 	default boolean isRequired(DependencyDescriptor descriptor) {
 		return descriptor.isRequired();
@@ -68,6 +87,13 @@ public interface AutowireCandidateResolver {
 	 * @since 5.1
 	 * @see org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver#hasQualifier
 	 */
+	/**
+	 * 确定给定的描述符是否声明了超出类型的限定符（通常-但不一定-特定类型的注释）。
+	 * 默认实现返回{@code false}。
+	 * @param descriptor 是目标方法参数或字段的描述符
+	 * @return 描述符是否声明了限定符，使候选状态缩小到类型匹配之外
+	 * @see org.springframework.beans.factory.annotation.QualifierAnnotationAutowireCandidateResolver#hasQualifier
+	 */
 	default boolean hasQualifier(DependencyDescriptor descriptor) {
 		return false;
 	}
@@ -79,6 +105,12 @@ public interface AutowireCandidateResolver {
 	 * @return the value suggested (typically an expression String),
 	 * or {@code null} if none found
 	 * @since 3.0
+	 */
+	/**
+	 * 确定是否建议给定依赖项的默认值。
+	 * 默认实现只是返回{@code null}。
+	 * @param descriptor 目标方法参数或字段的描述符
+	 * @return 建议的值（通常是表达式字符串），或{@code null}（如果找不到）
 	 */
 	@Nullable
 	default Object getSuggestedValue(DependencyDescriptor descriptor) {
@@ -94,6 +126,13 @@ public interface AutowireCandidateResolver {
 	 * @return the lazy resolution proxy for the actual dependency target,
 	 * or {@code null} if straight resolution is to be performed
 	 * @since 4.0
+	 */
+	/**
+	 * 如果注入点要求，则为实际依赖关系目标的延迟解析构建代理。
+	 * 默认实现只是返回{@code null}。
+	 * @param descriptor 目标方法参数或字段的描述符
+	 * @param beanName 包含注入点的bean的名称
+	 * @return 实际依赖目标的延迟分辨率代理，或{@code null}（如果是直接分辨率）将被执行
 	 */
 	@Nullable
 	default Object getLazyResolutionProxyIfNecessary(DependencyDescriptor descriptor, @Nullable String beanName) {
@@ -113,6 +152,13 @@ public interface AutowireCandidateResolver {
 	 * @since 5.2.7
 	 * @see GenericTypeAwareAutowireCandidateResolver#cloneIfNecessary()
 	 * @see DefaultListableBeanFactory#copyConfigurationFrom
+	 */
+	/**
+	 * 如有必要，返回此解析器实例的克隆，保留其本地配置，并允许该克隆的实例与新的bean工厂关联；
+	 * 如果没有这种状态，则将此原始实例与该实例关联。
+	 * 默认实现通过默认类构造函数创建一个单独的实例，假定没有要复制的特定配置状态。
+	 * 子类可以通过自定义配置状态处理或标准{@link Cloneable}支持（由Spring自己的可配置{@code AutowireCandidateResolver}变体实现）覆盖，也可以简单地返回{@code this}（如{@链接SimpleAutowireCandidateResolver}）。 * @since 5.2.7 * @see GenericTypeAwareAutowireCandidateResolver＃cloneIfNecessary（）* @see DefaultListableBeanFactory＃copyConfigurationFrom
+	 * @return
 	 */
 	default AutowireCandidateResolver cloneIfNecessary() {
 		return BeanUtils.instantiateClass(getClass());
