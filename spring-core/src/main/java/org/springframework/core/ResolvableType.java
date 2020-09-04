@@ -176,6 +176,12 @@ public class ResolvableType implements Serializable {
 	 * Private constructor used to create a new {@link ResolvableType} for cache key purposes,
 	 * with no upfront resolution.
 	 */
+	/**
+	 * 私有构造函数，用于创建新的{@link ResolvableType}以用于缓存key，无需预先解析。
+	 * @param type：类型
+	 * @param typeProvider：类型供应商
+	 * @param variableResolver：变量解析器
+	 */
 	private ResolvableType(
 			Type type, @Nullable TypeProvider typeProvider, @Nullable VariableResolver variableResolver) {
 
@@ -192,6 +198,14 @@ public class ResolvableType implements Serializable {
 	 * with upfront resolution and a pre-calculated hash.
 	 * @since 4.2
 	 */
+	/**
+	 * 专用构造函数，用于创建新的{@link ResolvableType}以用于缓存值，
+	 * 具有前期解析和预先计算的哈希值。
+	 * @param type：类型
+	 * @param typeProvider：类型供应商
+	 * @param variableResolver：变量解析器
+	 * @param hash：哈希值
+	 */
 	private ResolvableType(Type type, @Nullable TypeProvider typeProvider,
 			@Nullable VariableResolver variableResolver, @Nullable Integer hash) {
 
@@ -206,6 +220,14 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Private constructor used to create a new {@link ResolvableType} for uncached purposes,
 	 * with upfront resolution but lazily calculated hash.
+	 */
+	/**
+	 * 私有构造函数用于创建一个新的{@link ResolvableType}用于未缓存的目的，
+	 * 具有预先解析，但计算的哈希值却很懒。
+	 * @param type
+	 * @param typeProvider
+	 * @param variableResolver
+	 * @param componentType
 	 */
 	private ResolvableType(Type type, @Nullable TypeProvider typeProvider,
 			@Nullable VariableResolver variableResolver, @Nullable ResolvableType componentType) {
@@ -223,6 +245,11 @@ public class ResolvableType implements Serializable {
 	 * Avoids all {@code instanceof} checks in order to create a straight {@link Class} wrapper.
 	 * @since 4.2
 	 */
+	/**
+	 * 私有构造函数，用于在{@link Class}的基础上创建新的{@link ResolvableType}。
+	 * 避免为了创建直接的{@link Class}包装程序而进行的所有{@code instanceof}检查。
+	 * @param clazz
+	 */
 	private ResolvableType(@Nullable Class<?> clazz) {
 		this.resolved = (clazz != null ? clazz : Object.class);
 		this.type = this.resolved;
@@ -236,7 +263,7 @@ public class ResolvableType implements Serializable {
 	/**
 	 * Return the underling Java {@link Type} being managed.
 	 */
-  /** 返回管理的Java类型，使用序列化类型包装器解除包装 */
+  	/** 返回管理的Java类型，使用序列化类型包装器解除包装 */
 	public Type getType() {
 		return SerializableTypeWrapper.unwrap(this.type);
 	}
@@ -245,7 +272,7 @@ public class ResolvableType implements Serializable {
 	 * Return the underlying Java {@link Class} being managed, if available;
 	 * otherwise {@code null}.
 	 */
-  /** 返回原始类型 */
+  	/** 返回原始类型 */
 	@Nullable
 	public Class<?> getRawClass() {
 		if (this.type == this.resolved) {
@@ -265,7 +292,7 @@ public class ResolvableType implements Serializable {
 	 * never return {@code null}. This method is primarily to provide access to additional
 	 * type information or meta-data that alternative JVM languages may provide.
 	 */
-  /** 返回解析类型的源 */
+ 	 /** 返回解析类型的源 */
 	public Object getSource() {
 		Object source = (this.typeProvider != null ? this.typeProvider.getSource() : null);
 		return (source != null ? source : this.type);
@@ -279,6 +306,12 @@ public class ResolvableType implements Serializable {
 	 * @see #getRawClass()
 	 * @see #resolve(Class)
 	 */
+	/**
+	 * 将此类型作为已解析的{@code Class}返回，如果没有特定的类可以解析，则返回{@link java.lang.Object}。
+	 * @return 已解决的{@link Class}或{@code Object}
+	 * @see #getRawClass（）
+	 * @see #resolve（Class）
+	 */
 	public Class<?> toClass() {
 		return resolve(Object.class);
 	}
@@ -288,6 +321,11 @@ public class ResolvableType implements Serializable {
 	 * @param obj the object to check
 	 * @since 4.2
 	 * @see #isAssignableFrom(Class)
+	 */
+	/**
+	 * 确定给定的对象是否是此{@code ResolvableType}的实例。
+	 * @param obj 要检查的对象
+	 * @see #isAssignableFrom（Class）
 	 */
 	public boolean isInstance(@Nullable Object obj) {
 		return (obj != null && isAssignableFrom(obj.getClass()));
@@ -299,6 +337,11 @@ public class ResolvableType implements Serializable {
 	 * @param other the type to be checked against (as a {@code Class})
 	 * @since 4.2
 	 * @see #isAssignableFrom(ResolvableType)
+	 */
+	/**
+	 * 确定是否可以从指定的其他类型分配此{@code ResolvableType}。
+	 * @param other 要检查的类型（作为{@code类}）
+	 * @see #isAssignableFrom（ResolvableType）
 	 */
 	public boolean isAssignableFrom(Class<?> other) {
 		return isAssignableFrom(forClass(other), null);
