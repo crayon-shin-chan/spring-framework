@@ -113,39 +113,43 @@ public class ResolvableType implements Serializable {
 	 * {@code ResolvableType} returned when no value is available. {@code NONE} is used
 	 * in preference to {@code null} so that multiple method calls can be safely chained.
 	 */
+	/**
+	 * 如果没有可用值，则返回{@code ResolvableType}。
+	 * 优先使用{@code NONE}而不是{@code null}，以便可以安全地链接多个方法调用。
+	 */
 	public static final ResolvableType NONE = new ResolvableType(EmptyType.INSTANCE, null, null, 0);
 
+	/* 空类型数组 */
 	private static final ResolvableType[] EMPTY_TYPES_ARRAY = new ResolvableType[0];
 
-  /** 缓存 */
-	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache =
-			new ConcurrentReferenceHashMap<>(256);
+  	/** 缓存 */
+	private static final ConcurrentReferenceHashMap<ResolvableType, ResolvableType> cache = new ConcurrentReferenceHashMap<>(256);
 
 
 	/**
 	 * The underlying Java type being managed.
 	 */
-  /** 管理的Java类型 */
+  	/** 管理的Java类型 */
 	private final Type type;
 
 	/**
 	 * Optional provider for the type.
 	 */
-  /** 类型供应商 */
+  	/** 类型供应商 */
 	@Nullable
 	private final TypeProvider typeProvider;
 
 	/**
 	 * The {@code VariableResolver} to use or {@code null} if no resolver is available.
 	 */
-  /** 变量解析器 */
+  	/** 变量解析器 */
 	@Nullable
 	private final VariableResolver variableResolver;
 
 	/**
 	 * The component type for an array or {@code null} if the type should be deduced.
 	 */
-  /** 数组组件类型 */
+  	/** 数组组件类型 */
 	@Nullable
 	private final ResolvableType componentType;
 
@@ -155,15 +159,15 @@ public class ResolvableType implements Serializable {
 	@Nullable
 	private Class<?> resolved;
 
-  /** 父类型 */
+  	/** 父类型 */
 	@Nullable
 	private volatile ResolvableType superType;
 
-  /** 接口类型 */
+  	/** 接口类型 */
 	@Nullable
 	private volatile ResolvableType[] interfaces;
 
-  /** 泛型类型 */
+  	/** 泛型类型 */
 	@Nullable
 	private volatile ResolvableType[] generics;
 
