@@ -33,6 +33,12 @@ import org.springframework.lang.Nullable;
  * @author Rob Harrop
  * @since 2.0
  */
+
+/**
+ * 简单的{@link SourceExtractor}实现仅将候选源元数据对象传递给附件。
+ * 使用此实现意味着工具将原始访问该工具提供的基础配置源元数据。
+ * 不应在生产应用程序中使用此实现，因为它可能会在内存中保留过多的元数据（不必要）。 * * @作者罗伯·哈罗普* @开始2.
+ */
 public class PassThroughSourceExtractor implements SourceExtractor {
 
 	/**
