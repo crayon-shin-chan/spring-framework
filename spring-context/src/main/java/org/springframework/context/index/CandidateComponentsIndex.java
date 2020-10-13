@@ -46,6 +46,14 @@ import org.springframework.util.MultiValueMap;
  * @author Stephane Nicoll
  * @since 5.0
  */
+
+/**
+ * 提供对{@code META-INF / spring.components}中定义的候选者的访问。
+ * 可以在索引上注册（和查询）任意数量的stereotype
+ * 典型示例是为某个特定用例标记该类的注释的完全限定名称。以下调用返回{@code com.example}包（及其子包）的所有{@code @Component}候选类型：
+ * Set<String> candidates = index.getCandidateTypes（“com.example”，“org.springframework.stereotype.Component”）;
+ * {@code type}通常是类的完全限定名称，尽管这不是规则。同样，{@code stereotype}通常是目标类型的全限定名，但实际上可以是任何标记。
+ */
 public class CandidateComponentsIndex {
 
 	private static final AntPathMatcher pathMatcher = new AntPathMatcher(".");
