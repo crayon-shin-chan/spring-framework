@@ -38,6 +38,14 @@ import org.springframework.lang.Nullable;
  * @see BeanFactory#getBeanProvider
  * @see org.springframework.beans.factory.annotation.Autowired
  */
+/**
+ * {@link ObjectFactory}的一种变体，专门为注入点设计，允许程序选择和宽大的非唯一处理。
+ * 此接口扩展了{@link Iterable}并提供了{@link Stream}支持。
+ * 因此，可以在{@code for}循环中使用它，提供{@link #forEach} 迭代，并允许使用集合样式{@link #stream}访问。
+ * @param <T> 对象类型
+ * @see BeanFactory＃getBeanProvider
+ * @see org.springframework.beans.factory.annotation.Autowired
+ */
 public interface ObjectProvider<T> extends ObjectFactory<T>, Iterable<T> {
 
 	/**

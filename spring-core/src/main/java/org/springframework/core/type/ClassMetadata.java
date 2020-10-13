@@ -55,6 +55,7 @@ public interface ClassMetadata {
 	 * Return whether the underlying class represents a concrete class,
 	 * i.e. neither an interface nor an abstract class.
 	 */
+	/* 返回基础类是否表示具体类，即接口或抽象类。 */
 	default boolean isConcrete() {
 		return !(isInterface() || isAbstract());
 	}
@@ -69,6 +70,7 @@ public interface ClassMetadata {
 	 * it is a top-level class or a nested class (static inner class) that
 	 * can be constructed independently from an enclosing class.
 	 */
+	/** 确定基础类是否是独立的，即是可以独立于封闭类构造的顶级类还是嵌套类（静态内部类） */
 	boolean isIndependent();
 
 	/**
