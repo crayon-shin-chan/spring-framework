@@ -458,6 +458,16 @@ public @interface Configuration {
 	 * behaviorally equivalent to removing the {@code @Configuration} stereotype.
 	 * @since 5.2
 	 */
+	/**
+	 * 指定是否应强制使用{@link Bean}方法以实施bean生命周期行为，例如返回在用户代码中直接{@code @Bean}方法调用的情况下，甚至返回共享的singleton bean实例。
+	 * 此功能需要方法拦截，方法是通过运行时生成的CGLIB子类实现的，该子类具有局限性，例如配置类和不允许其方法声明{@code final}。
+	 * 默认值为{@code true}，允许通过配置类内的直接方法调用以及该配置的{@code @Bean}方法的外部调用进行“bean间引用”。从另一个配置类。
+	 * 如果由于每个特定配置的{@code @Bean}方法都是自包含的，并且被设计为供容器使用的普通工厂方法，因此不需要这样做，请将该标志切换为{@code false}，以避免CGLIB子类处理。
+	 * 关闭Bean方法拦截可有效处理{@code @Bean}方法，就像在非{@code @Configuration}类上声明时一样，也称为“@Bean Lite模式”
+	 * （请参阅{@link Bean @Bean的javadoc}）。
+	 * 因此，从行为上讲，它等同于删除{@code @Configuration}构造型。
+	 * @return
+	 */
 	boolean proxyBeanMethods() default true;
 
 }
