@@ -84,6 +84,19 @@ import java.lang.annotation.Target;
  * @author Stephane Nicoll
  * @since 5.0
  */
+
+/**
+ * 指示带注释的元素表示索引的构造型。
+ * {@code CandidateComponentsIndex}是使用在编译时生成的元数据文件的类路径扫描的替代方法。
+ * 索引允许根据构造型检索候选组件（即完全限定的名称）。
+ * 该注释指示生成器对存在被注释元素的元素进行索引，或者实现或从被注释元素扩展。
+ * 构造型是带注释元素的完全限定名称。
+ * 请考虑默认的{@link Component}注释，该注释使用此注释进行了元注释。
+ * 如果使用{@link Component}注释组件，则将使用{@code org.springframework.stereotype.Component}构造型将该组件的条目添加到索引。
+ * 此注释在元注释上也很受好评。考虑以下自定义注释：
+ * 因为此类实现了索引的接口，所以它将自动包含在{@code com.example.AdminService}构造型中。
+ * 如果层次结构中有更多的{@code @Indexed}接口和/或超类，则该类将映射到其所有构造型。
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
