@@ -84,7 +84,9 @@ public class AnnotatedBeanDefinitionReader {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		Assert.notNull(environment, "Environment must not be null");
 		this.registry = registry;
+		/* 条件评估 */
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
+		/* 为bean工厂添加注解配置后处理器，处理Configuration等注解 */
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
@@ -246,21 +248,33 @@ public class AnnotatedBeanDefinitionReader {
 	 * {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
 	 * @since 5.0
 	 */
+	/**
+	 * 从给定的bean类中注册一个bean，并从类声明的批注中派生其元数据。
+	 * @param beanClass Bean的类
+	 * @param name 为bean的显式名称
+	 * @param qualifiers 要考虑的特定限定符注释（如果有的话）除Bean类级别的限定符之外
+	 * @param supplier 用于创建的回调Bean的实例（可能为{@code null}）
+	 * @param customizers 一个或多个用于自定义工厂的{{link BeanDefinition}的回调，例如设置一个惰性初始或主要标志
+	 */
 	private <T> void doRegisterBean(Class<T> beanClass, @Nullable String name,
 			@Nullable Class<? extends Annotation>[] qualifiers, @Nullable Supplier<T> supplier,
 			@Nullable BeanDefinitionCustomizer[] customizers) {
-
+		/* 通用注解bean定义 */
 		AnnotatedGenericBeanDefinition abd = new AnnotatedGenericBeanDefinition(beanClass);
+		/* 条件评估是否跳过 */
 		if (this.conditionEvaluator.shouldSkip(abd.getMetadata())) {
 			return;
 		}
-
+		/* 实例供应商 */
 		abd.setInstanceSupplier(supplier);
+		/* 解析scope */
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
+		/* 生成bean名称 */
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
-
+		/* 处理通用定义注解 */
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
+		/* 处理传入的通用注解 */
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
 				if (Primary.class == qualifier) {
@@ -274,6 +288,7 @@ public class AnnotatedBeanDefinitionReader {
 				}
 			}
 		}
+		/* 定制化bean定义 */
 		if (customizers != null) {
 			for (BeanDefinitionCustomizer customizer : customizers) {
 				customizer.customize(abd);
@@ -281,7 +296,9 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
+		/* 应用scope代理，实现原型模式 */
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		/* 注册bean定义 */
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 
