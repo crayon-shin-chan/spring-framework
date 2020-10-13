@@ -81,24 +81,29 @@ abstract class ConfigurationClassUtils {
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
 	 */
-	public static boolean checkConfigurationClassCandidate(
-			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
+	/**
+	 * 检查给定的bean定义是否适合配置类（或在配置/组件类中声明的嵌套组件类，也要自动注册），并进行相应标记。
+	 * @param beanDef 要检查的bean定义
+	 * @param metadataReaderFactory 调用方正在使用的当前工厂
+	 * @return 候选者是否符合（任何一种）配置类的条件
+	 */
+	public static boolean checkConfigurationClassCandidate(BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
 		String className = beanDef.getBeanClassName();
+		/* 类名为空，或者工厂方法名称存在，则必然不是配置类 */
 		if (className == null || beanDef.getFactoryMethodName() != null) {
 			return false;
 		}
 
 		AnnotationMetadata metadata;
-		if (beanDef instanceof AnnotatedBeanDefinition &&
-				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
-			// Can reuse the pre-parsed metadata from the given BeanDefinition...
+		if (beanDef instanceof AnnotatedBeanDefinition && className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
+			/* 可以重用来自给定BeanDefinition的预先解析的元数据。 */
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
-			// Check already loaded Class if present...
-			// since we possibly can't even load the class file for this Class.
+			/* 检查已经加载的Class（如果存在）因为我们甚至可能无法加载该Class的class文件。 */
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
+			/* bean工厂后处理器、bean后处理器、aop基础设施bean、事件监听器工厂bean，这些都不是配置类 */
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
 					AopInfrastructureBean.class.isAssignableFrom(beanClass) ||
@@ -109,20 +114,22 @@ abstract class ConfigurationClassUtils {
 		}
 		else {
 			try {
+				/* 读取注解元数据 */
 				MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
 				metadata = metadataReader.getAnnotationMetadata();
 			}
 			catch (IOException ex) {
 				if (logger.isDebugEnabled()) {
-					logger.debug("Could not find class file for introspecting configuration annotations: " +
-							className, ex);
+					logger.debug("Could not find class file for introspecting configuration annotations: " + className, ex);
 				}
 				return false;
 			}
 		}
-
+		/** 获取{@link Configuration}注解属性 */
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		/** {@link Configuration}注解存在，且{@link Configuration#proxyBeanMethods()}不是False */
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
+			/* 完全配置类 */
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
 		else if (config != null || isConfigurationCandidate(metadata)) {
@@ -132,7 +139,7 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
-		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		/* 获取排序值 */
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
@@ -148,20 +155,25 @@ abstract class ConfigurationClassUtils {
 	 * @return {@code true} if the given class is to be registered for
 	 * configuration class processing; {@code false} otherwise
 	 */
+	/**
+	 * 检查给定的元数据中的配置类候选对象（或在配置/组件类中声明的嵌套组件类）。
+	 * @param metadata 带注释类的元数据
+	 * @return {@code true}，如果要注册给定的类以进行配置类处理； {@code false}否则
+	 */
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
-		// Do not consider an interface or an annotation...
+		/* 接口不考虑 */
 		if (metadata.isInterface()) {
 			return false;
 		}
 
-		// Any of the typical annotations found?
+		/* 有指定注解，则为配置类候选 */
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;
 			}
 		}
 
-		// Finally, let's look for @Bean methods...
+		/** 只要有{@link Bean}注解的方法，就是候选 */
 		try {
 			return metadata.hasAnnotatedMethods(Bean.class.getName());
 		}
