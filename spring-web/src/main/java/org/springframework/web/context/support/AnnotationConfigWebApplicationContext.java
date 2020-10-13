@@ -263,7 +263,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
 		/* 注解Bean定义读取器 */
 		AnnotatedBeanDefinitionReader reader = getAnnotatedBeanDefinitionReader(beanFactory);
-		/* 类路径Bean定义扫描 */
+		/* 类路径Bean定义扫描器 */
 		ClassPathBeanDefinitionScanner scanner = getClassPathBeanDefinitionScanner(beanFactory);
 
 		BeanNameGenerator beanNameGenerator = getBeanNameGenerator();
@@ -272,7 +272,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 			scanner.setBeanNameGenerator(beanNameGenerator);
 			beanFactory.registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR, beanNameGenerator);
 		}
-
+		/* scope元数据解析器 */
 		ScopeMetadataResolver scopeMetadataResolver = getScopeMetadataResolver();
 		if (scopeMetadataResolver != null) {
 			reader.setScopeMetadataResolver(scopeMetadataResolver);
