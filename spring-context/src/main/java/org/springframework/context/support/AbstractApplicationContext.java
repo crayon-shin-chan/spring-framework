@@ -38,6 +38,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.support.ResourceEditorRegistrar;
 import org.springframework.context.ApplicationContext;
@@ -786,7 +787,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @param beanFactory 要配置的BeanFactory
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
-		// Tell the internal bean factory to use the context's class loader etc.
+
 		/* 告诉内部bean工厂使用上下文的类加载器等。 */
 		beanFactory.setBeanClassLoader(getClassLoader());
 		if (!shouldIgnoreSpel) {
@@ -806,25 +807,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
 		beanFactory.ignoreDependencyInterface(ApplicationStartup.class);
 
-		// BeanFactory interface not registered as resolvable type in a plain factory.
-		// MessageSource registered (and found for autowiring) as a bean.
-		/**
-		 * BeanFactory接口未在普通工厂中注册为可解析类型。 MessageSource注册为Bean（并发现用于自动装配）。
-		 */
+		/** BeanFactory接口未在普通工厂中注册为可解析类型。 MessageSource注册为Bean（并发现用于自动装配）。*/
 		beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
 		beanFactory.registerResolvableDependency(ResourceLoader.class, this);
 		beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
-		/**
-		 * 注册早期的后处理器以将内部bean检测为{@link ApplicationListener}。
-		 */
+		/** 注册早期的后处理器以将内部bean检测为{@link ApplicationListener}。*/
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
-		// Detect a LoadTimeWeaver and prepare for weaving, if found.
-		/**
-		 * 如果不在本地镜像关键中，并且发现LoadTimeWeaver，请准备编织。
-		 */
+		/** 织入后处理器 */
 		if (!IN_NATIVE_IMAGE && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			// Set a temporary ClassLoader for type matching.
@@ -876,9 +868,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());
-
-		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
-		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
 		/**
 		 * 检测LoadTimeWeaver并准备进行编织，如果同时发现（例如通过ConfigurationClassPostProcessor注册的@Bean方法）
 		 */
@@ -894,7 +883,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Must be called before any instantiation of application beans.
 	 */
 	/**
-	 * 实例化并注册所有{@linkBeanPostProcessor}遵循显式顺序（如果给定的话）。
+	 * 实例化并注册所有{@link BeanPostProcessor}遵循显式顺序（如果给定的话）。
 	 * 必须在应用程序bean的任何实例化之前被调用。
 	 * @param beanFactory
 	 */
