@@ -25,7 +25,9 @@ import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.config.SmartInstantiationAwareBeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.event.DefaultEventListenerFactory;
@@ -133,6 +135,10 @@ public abstract class AnnotationConfigUtils {
 	 * Register all relevant annotation post processors in the given registry.
 	 * @param registry the registry to operate on
 	 */
+	/**
+	 * 在给定的注册表中注册所有相关的注释后处理器。
+	 * @param registry 要在其上进行操作的注册表
+	 */
 	public static void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
 		registerAnnotationConfigProcessors(registry, null);
 	}
@@ -145,14 +151,23 @@ public abstract class AnnotationConfigUtils {
 	 * @return a Set of BeanDefinitionHolders, containing all bean definitions
 	 * that have actually been registered by this call
 	 */
+	/**
+	 * 在给定的注册表中注册所有相关的注释后处理器。
+	 * @param registry 注册表要在其上操作的注册表
+	 * @param source 源配置源元素（已提取）*触发此注册的源。可能为{@code null}。
+	 * @return 一组BeanDefinitionHolders，其中包含此调用实际上已注册的所有bean定义
+	 */
 	public static Set<BeanDefinitionHolder> registerAnnotationConfigProcessors(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 
+		/* 获取内部BeanFactory */
 		DefaultListableBeanFactory beanFactory = unwrapDefaultListableBeanFactory(registry);
 		if (beanFactory != null) {
+			/** 配置{@link AnnotationAwareOrderComparator}注解依赖比较器 */
 			if (!(beanFactory.getDependencyComparator() instanceof AnnotationAwareOrderComparator)) {
 				beanFactory.setDependencyComparator(AnnotationAwareOrderComparator.INSTANCE);
 			}
+			/** 配置{@link ContextAnnotationAutowireCandidateResolver}自动注入候选解析器 */
 			if (!(beanFactory.getAutowireCandidateResolver() instanceof ContextAnnotationAutowireCandidateResolver)) {
 				beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
 			}
@@ -160,26 +175,27 @@ public abstract class AnnotationConfigUtils {
 
 		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
 
+		/** 注册{@link ConfigurationClassPostProcessor}，实现了{@link BeanDefinitionRegistryPostProcessor}，用于添加Bean定义 */
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
-
+		/** 注册{@link AutowiredAnnotationBeanPostProcessor}，实现了{@link SmartInstantiationAwareBeanPostProcessor}，用于拦截Bean创建 */
 		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
-		// Check for JSR-250 support, and if present add the CommonAnnotationBeanPostProcessor.
+		/** 注册{@link CommonAnnotationBeanPostProcessor}，实现了{@link org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor}，处理通用注解 */
 		if (jsr250Present && !registry.containsBeanDefinition(COMMON_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(CommonAnnotationBeanPostProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
-		// Check for JPA support, and if present add the PersistenceAnnotationBeanPostProcessor.
+		/** 注册{@link PersistenceAnnotationBeanPostProcessor}支持JPA注解 */
 		if (jpaPresent && !registry.containsBeanDefinition(PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition();
 			try {
@@ -194,12 +210,14 @@ public abstract class AnnotationConfigUtils {
 			beanDefs.add(registerPostProcessor(registry, def, PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME));
 		}
 
+		/**  注册{@link EventListenerMethodProcessor}，用于处理{@link org.springframework.context.event.EventListener}注解 */
 		if (!registry.containsBeanDefinition(EVENT_LISTENER_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(EventListenerMethodProcessor.class);
 			def.setSource(source);
 			beanDefs.add(registerPostProcessor(registry, def, EVENT_LISTENER_PROCESSOR_BEAN_NAME));
 		}
 
+		/** 注册{@link DefaultEventListenerFactory} */
 		if (!registry.containsBeanDefinition(EVENT_LISTENER_FACTORY_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(DefaultEventListenerFactory.class);
 			def.setSource(source);
@@ -230,11 +248,20 @@ public abstract class AnnotationConfigUtils {
 		}
 	}
 
+	/* 处理通用定义注解 */
 	public static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd) {
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}
 
+	/** 处理通用定义注解
+	 * @see Lazy
+	 * @see Primary
+	 * @see DependsOn
+	 * @see Role
+	 * @see Description
+	 */
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
+		/** 获取{@link Lazy}注解属性，设置{@link AnnotatedBeanDefinition#setLazyInit(boolean)}  */
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
 		if (lazy != null) {
 			abd.setLazyInit(lazy.getBoolean("value"));
@@ -245,19 +272,21 @@ public abstract class AnnotationConfigUtils {
 				abd.setLazyInit(lazy.getBoolean("value"));
 			}
 		}
-
+		/** 获取{@link Primary}注解属性，设置{@link AnnotatedBeanDefinition#setPrimary(boolean)}  */
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			abd.setPrimary(true);
 		}
+		/** 获取{@link DependsOn}注解属性，设置{@link AnnotatedBeanDefinition#setDependsOn(String...)} */
 		AnnotationAttributes dependsOn = attributesFor(metadata, DependsOn.class);
 		if (dependsOn != null) {
 			abd.setDependsOn(dependsOn.getStringArray("value"));
 		}
-
+		/** 获取{@link Role}注解属性，设置{@link AnnotatedBeanDefinition#setRole(int)} */
 		AnnotationAttributes role = attributesFor(metadata, Role.class);
 		if (role != null) {
 			abd.setRole(role.getNumber("value").intValue());
 		}
+		/** 获取{@link Description}注解属性，设置{@link AnnotatedBeanDefinition#setDescription(String)} */
 		AnnotationAttributes description = attributesFor(metadata, Description.class);
 		if (description != null) {
 			abd.setDescription(description.getString("value"));
