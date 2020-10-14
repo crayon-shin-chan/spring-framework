@@ -180,6 +180,7 @@ class ConfigurationClassParser {
 	 * @param configCandidates
 	 */
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
+		/* 解析配置类bean定义 */
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
@@ -204,7 +205,7 @@ class ConfigurationClassParser {
 						"Failed to parse configuration class [" + bd.getBeanClassName() + "]", ex);
 			}
 		}
-
+		/* 延迟导入选择处理器执行 */
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -844,9 +845,12 @@ class ConfigurationClassParser {
 		}
 	}
 
-
+	/**
+	 * 延迟导入选择器处理器
+	 */
 	private class DeferredImportSelectorHandler {
 
+		/* 所有的延迟导入选择器列表，如果存在，则不分组处理，如果不存在，则分组处理 */
 		@Nullable
 		private List<DeferredImportSelectorHolder> deferredImportSelectors = new ArrayList<>();
 
@@ -858,23 +862,35 @@ class ConfigurationClassParser {
 		 * @param configClass the source configuration class
 		 * @param importSelector the selector to handle
 		 */
+		/**
+		 * 处理指定的{@link DeferredImportSelector}。
+		 * 如果要收集延迟的导入选择器，则此实例将注册到列表中。
+		 * 如果正在处理它们，则{@link DeferredImportSelector}也将根据其{@link DeferredImportSelector.Group}立即被处理
+		 * @param configClass 源配置类
+		 * @param importSelector 要处理的选择器
+		 */
 		public void handle(ConfigurationClass configClass, DeferredImportSelector importSelector) {
 			DeferredImportSelectorHolder holder = new DeferredImportSelectorHolder(configClass, importSelector);
+			/* 列表为空 */
 			if (this.deferredImportSelectors == null) {
+				/* 使用分组处理器，执行分组导入 */
 				DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
 				handler.register(holder);
 				handler.processGroupImports();
 			}
 			else {
+				/* 不使用分组导入 */
 				this.deferredImportSelectors.add(holder);
 			}
 		}
 
+		/* 执行导入 */
 		public void process() {
 			List<DeferredImportSelectorHolder> deferredImports = this.deferredImportSelectors;
 			this.deferredImportSelectors = null;
 			try {
 				if (deferredImports != null) {
+					/* 执行分组导入所有的 */
 					DeferredImportSelectorGroupingHandler handler = new DeferredImportSelectorGroupingHandler();
 					deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);
 					deferredImports.forEach(handler::register);
@@ -888,28 +904,34 @@ class ConfigurationClassParser {
 	}
 
 
+	/* 延迟导入选择器分组处理器，当列表为空，则使用分组处理 */
 	private class DeferredImportSelectorGroupingHandler {
 
 		private final Map<Object, DeferredImportSelectorGrouping> groupings = new LinkedHashMap<>();
 
 		private final Map<AnnotationMetadata, ConfigurationClass> configurationClasses = new HashMap<>();
 
+		/* 注册一个持有器 */
 		public void register(DeferredImportSelectorHolder deferredImport) {
+			/* 获取分组类 */
 			Class<? extends Group> group = deferredImport.getImportSelector().getImportGroup();
-			DeferredImportSelectorGrouping grouping = this.groupings.computeIfAbsent(
-					(group != null ? group : deferredImport),
-					key -> new DeferredImportSelectorGrouping(createGroup(group)));
+			/* 获取选择器分组，如果为空，则创建分组 */
+			DeferredImportSelectorGrouping grouping = this.groupings.computeIfAbsent((group != null ? group : deferredImport), key -> new DeferredImportSelectorGrouping(createGroup(group)));
 			grouping.add(deferredImport);
-			this.configurationClasses.put(deferredImport.getConfigurationClass().getMetadata(),
-					deferredImport.getConfigurationClass());
+			this.configurationClasses.put(deferredImport.getConfigurationClass().getMetadata(), deferredImport.getConfigurationClass());
 		}
 
+		/* 执行分组导入 */
 		public void processGroupImports() {
+			/* 遍历选择器分组 */
 			for (DeferredImportSelectorGrouping grouping : this.groupings.values()) {
+				/* 获取分组的候选过滤器 */
 				Predicate<String> exclusionFilter = grouping.getCandidateFilter();
+				/* 遍历每个分组的导入条目 */
 				grouping.getImports().forEach(entry -> {
 					ConfigurationClass configurationClass = this.configurationClasses.get(entry.getMetadata());
 					try {
+						/* 处理此分组导入类名的导入 */
 						processImports(configurationClass, asSourceClass(configurationClass, exclusionFilter),
 								Collections.singleton(asSourceClass(entry.getImportClassName(), exclusionFilter)),
 								exclusionFilter, false);
@@ -926,7 +948,9 @@ class ConfigurationClassParser {
 			}
 		}
 
+		/* 创建组对象 */
 		private Group createGroup(@Nullable Class<? extends Group> type) {
+			/* 不存在使用默认组 */
 			Class<? extends Group> effectiveType = (type != null ? type : DefaultDeferredImportSelectorGroup.class);
 			return ParserStrategyUtils.instantiateClass(effectiveType, Group.class,
 					ConfigurationClassParser.this.environment,
@@ -935,7 +959,7 @@ class ConfigurationClassParser {
 		}
 	}
 
-
+	/* 延迟导入选择器持有器 */
 	private static class DeferredImportSelectorHolder {
 
 		private final ConfigurationClass configurationClass;
@@ -956,11 +980,11 @@ class ConfigurationClassParser {
 		}
 	}
 
-
+	/* 延迟导入选择器分组 */
 	private static class DeferredImportSelectorGrouping {
-
+		/* 分组对象 */
 		private final DeferredImportSelector.Group group;
-
+		/* 此分组下的延迟导入选择器 */
 		private final List<DeferredImportSelectorHolder> deferredImports = new ArrayList<>();
 
 		DeferredImportSelectorGrouping(Group group) {
@@ -975,14 +999,21 @@ class ConfigurationClassParser {
 		 * Return the imports defined by the group.
 		 * @return each import with its associated configuration class
 		 */
+		/**
+		 * 返回由组定义的导入。
+		 * @return 每个导入及其关联的配置类
+		 */
 		public Iterable<Group.Entry> getImports() {
+			/* 遍历所有导入延迟导入选择器持有者 */
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
-				this.group.process(deferredImport.getConfigurationClass().getMetadata(),
-						deferredImport.getImportSelector());
+				/* 使用延迟导入分组处理元数据、延迟导入选择器 */
+				this.group.process(deferredImport.getConfigurationClass().getMetadata(), deferredImport.getImportSelector());
 			}
+			/* 返回处理后的条目 */
 			return this.group.selectImports();
 		}
 
+		/* 获取排除过滤器 */
 		public Predicate<String> getCandidateFilter() {
 			Predicate<String> mergedFilter = DEFAULT_EXCLUSION_FILTER;
 			for (DeferredImportSelectorHolder deferredImport : this.deferredImports) {
@@ -995,7 +1026,7 @@ class ConfigurationClassParser {
 		}
 	}
 
-
+	/* 默认分组，所有导入的类名都返回为条目 */
 	private static class DefaultDeferredImportSelectorGroup implements Group {
 
 		private final List<Entry> imports = new ArrayList<>();
