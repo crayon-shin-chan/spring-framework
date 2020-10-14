@@ -260,6 +260,11 @@ public @interface Bean {
 	 * that are not meant to get in the way of beans of the same type in other places.
 	 * @since 5.1
 	 */
+	/**
+	 * 该bean是否适合自动连接到其他bean
+	 * 默认为{@code true}；对于内部委托，请将其设置为{@code false}，但这并不意味着在其他地方会妨碍相同类型的Bean。
+	 * @return
+	 */
 	boolean autowireCandidate() default true;
 
 	/**
