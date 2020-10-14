@@ -35,6 +35,14 @@ import org.springframework.lang.Nullable;
  * @author Stephane Nicoll
  * @since 4.0
  */
+
+/**
+ * {@link ImportSelector}的一种变体，在所有{@code @Configuration}bean被处理之后运行。
+ * 当所选的导入为{@code @Conditional}时，这种选择器特别有用。
+ * 实现还可以扩展{@link org.springframework.core.Ordered}接口或使用{@link org.springframework.core.annotation.Order}注释来表示优先于
+ * 其他{@link DeferredImportSelector}。
+ * 实现还可以提供一个{@link #getImportGroup（）}，它可以为不同的选择器提供附加的排序和过滤逻辑。
+ */
 public interface DeferredImportSelector extends ImportSelector {
 
 	/**
@@ -42,6 +50,11 @@ public interface DeferredImportSelector extends ImportSelector {
 	 * <p>The default implementations return {@code null} for no grouping required.
 	 * @return the import group class, or {@code null} if none
 	 * @since 5.0
+	 */
+	/**
+	 * 返回特定的导入组。
+	 * 默认实现返回{@code null}，无需分组。
+	 * @return 导入组类；如果没有，则返回{@code null}
 	 */
 	@Nullable
 	default Class<? extends Group> getImportGroup() {
@@ -53,11 +66,19 @@ public interface DeferredImportSelector extends ImportSelector {
 	 * Interface used to group results from different import selectors.
 	 * @since 5.0
 	 */
+	/**
+	 * 用于对来自不同导入选择器的结果进行分组的接口。
+	 */
 	interface Group {
 
 		/**
 		 * Process the {@link AnnotationMetadata} of the importing @{@link Configuration}
 		 * class using the specified {@link DeferredImportSelector}.
+		 */
+		/**
+		 * 使用指定的{@link DeferredImportSelector}处理导入的{@link Configuration}类的{@link AnnotationMetadata}。
+		 * @param metadata
+		 * @param selector
 		 */
 		void process(AnnotationMetadata metadata, DeferredImportSelector selector);
 
@@ -65,12 +86,19 @@ public interface DeferredImportSelector extends ImportSelector {
 		 * Return the {@link Entry entries} of which class(es) should be imported
 		 * for this group.
 		 */
+		/**
+		 * 返回此组应导入的类的{@link Entry entry}。
+		 * @return
+		 */
 		Iterable<Entry> selectImports();
 
 
 		/**
 		 * An entry that holds the {@link AnnotationMetadata} of the importing
 		 * {@link Configuration} class and the class name to import.
+		 */
+		/**
+		 * 一个条目，其中包含导入{@link Configuration}类的{@link AnnotationMetadata}和要导入的类名。
 		 */
 		class Entry {
 
