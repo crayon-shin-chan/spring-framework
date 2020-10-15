@@ -128,6 +128,28 @@ import org.springframework.util.StringUtils;
  * @see Autowired
  * @see Value
  */
+
+/**
+ * {@link org.springframework.beans.factory.config.BeanPostProcessor}实现可以自动连接带注释的字段，setter方法和任意config方法。
+ * 此类要注入的成员通过注释检测：默认情况下，Spring的{@link Autowired}和{@link Value}注释。
+ * 还支持JSR-330的{@link javax.inject.Inject}批注（如果可用），以直接替代Spring自己的{@code @Autowired}。
+ * 自动装配构造函数任何给定bean类的构造函数都可以使用'required'属性设置为{@code true}，表示构造函数用作Spring bean时自动装配。
+ * 此外，如果将'required'属性设置为{@code true}，则仅单个构造函数可以用{@code @Autowired}进行注释。
+ * 如果多个非必需构造函数声明注释，则它们将被视为自动装配的候选对象。将选择通过在Spring容器中匹配bean可以满足的依赖项数量最多的构造函数。
+ * 如果没有一个候选者满意，则将使用主/默认构造函数（如果存在）。如果仅一个类声明一个单一的构造函数开始，即使没有注释，也将始终使用它。
+ * 带注释的构造函数不必是公共的。 自动连线字段字段是在构造bean之后立即调用任何config方法之前注入的。这样的配置字段不必是公共的。
+ * 自动装配方法Config方法可以具有任意名称和任意数量的参数； 这些参数中的每个参数都将与Spring容器中的匹配bean自动连接。
+ * Bean属性设置器方法实际上只是这种常规config方法的特例。Config方法不必是公共的。
+ * 注释配置与XML配置默认的{@code AutowiredAnnotationBeanPostProcessor}将通过“context：annotation-config”和“context：component-scan”XML标签进行注册。
+ * 如果打算指定自定义{@code AutowiredAnnotationBeanPostProcessor}bean定义，请删除或关闭默认注释配置。
+ * 注意：注释注入将在XML注入之前进行。因此，对于通过两种方法连接的属性，后一种配置将覆盖前一种配置。
+ * 除了如上所述的常规注入点外，该后处理器还处理Spring的{@link Lookup}批注，该批注标识查找在运行时由容器替换的方法。
+ * 这本质上是{@code getBean（Class，args）}和{@code getBean（String，args）}的类型安全版本。
+ * 有关详细信息，请参见{@link Lookup @Lookup的javadoc}。
+ * @see #setAutowiredAnnotationType
+ * @see Autowired
+ * @see Value
+ */
 public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationAwareBeanPostProcessor,
 		MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
 
