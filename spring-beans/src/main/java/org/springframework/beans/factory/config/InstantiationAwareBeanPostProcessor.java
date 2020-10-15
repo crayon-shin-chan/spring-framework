@@ -138,6 +138,18 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @since 5.1
 	 * @see #postProcessPropertyValues
 	 */
+	/**
+	 * 在工厂将它们应用于给定bean之前，对给定的属性值进行后处理，而无需任何属性描述符。
+	 * 如果实现提供自定义的{@link #postProcessPropertyValues}实现，则实现应返回{@code null}（默认值），否则返回{@code pvs}。
+	 * 在此接口的将来版本中（删除了{@link #postProcessPropertyValues}），
+	 * 默认实现将直接按原样返回给定的{@code pvs}。
+	 * @param pvs 工厂将要应用的属性值（从不使用{@code null}）
+	 * @param bean 创建了bean实例，但尚未设置其属性
+	 * @param beanName bean的名称
+	 * @return 要应用于给定bean的实际属性值（可以是传入的PropertyValues实例），或者返回{@code null}并继续使用现有属性，但特别是继续调用{@link #postProcessPropertyValues}（需要为当前bean类初始化{@code PropertyDescriptor}）
+	 * @throws BeansException 如果发生错误，则抛出org.springframework.beans.BeansException
+	 * @see #postProcessPropertyValues
+	 */
 	@Nullable
 	default PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName)
 			throws BeansException {
@@ -164,6 +176,20 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @see #postProcessProperties
 	 * @see org.springframework.beans.MutablePropertyValues
 	 * @deprecated as of 5.1, in favor of {@link #postProcessProperties(PropertyValues, Object, String)}
+	 */
+	/**
+	 * 在工厂将它们应用于给定bean之前，对给定属性值进行后处理。
+	 * 允许检查是否已满足所有依赖项，例如，基于bean属性设置器上的“Required”注释。
+	 * 还允许替换要应用的属性值，通常是通过以下方式进行的：基于原始的PropertyValues创建一个新的MutablePropertyValues实例，添加或删除特定的值。
+	 * 默认实现按原样返回给定的{@code pvs}。
+	 * @param pvs 工厂将要应用的属性值（从不使用{@code null}）
+	 * @param pds 目标bean的相关属性描述符（具有忽略的依赖类型-工厂专门处理的依赖类型-已经过滤掉了） ）
+	 * @param bean 创建了bean实例，但尚未设置其属性
+	 * @param beanName bean的名称
+	 * @return 要应用于给定bean的实际属性值（可以是传入的PropertyValues实例），或者{@code null}跳过属性填充
+	 * @throws BeansException 在出现错误的情况下抛出org.springframework.beans.BeansException
+	 * @see #postProcessProperties
+	 * @see org.springframework.beans.MutablePropertyValues
 	 */
 	@Deprecated
 	@Nullable
