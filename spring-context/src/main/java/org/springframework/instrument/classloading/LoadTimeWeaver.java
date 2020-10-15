@@ -30,12 +30,24 @@ import java.lang.instrument.ClassFileTransformer;
  * @since 2.0
  * @see java.lang.instrument.ClassFileTransformer
  */
+
+/**
+ * 加载时织入
+ * 定义将一个或多个{@link ClassFileTransformer}添加到{@link ClassLoader}的合同。
+ * 实现可以在当前上下文{@code ClassLoader}上操作或公开其自己的可检测{@code ClassLoader}。
+ * @see java.lang.instrument.ClassFileTransformer
+ */
 public interface LoadTimeWeaver {
 
 	/**
 	 * Add a {@code ClassFileTransformer} to be applied by this
 	 * {@code LoadTimeWeaver}.
 	 * @param transformer the {@code ClassFileTransformer} to add
+	 */
+	/**
+	 * 添加一个{@code ClassFileTransformer}，以供此{@code LoadTimeWeaver}应用。
+	 * @param transformer {@code ClassFileTransformer}要添加
+	 * @param transformer
 	 */
 	void addTransformer(ClassFileTransformer transformer);
 
@@ -48,6 +60,11 @@ public interface LoadTimeWeaver {
 	 * @return the {@code ClassLoader} which will expose
 	 * instrumented classes according to the registered transformers
 	 */
+	/**
+	 * 返回一个基于用户定义的{@link ClassFileTransformer}通过AspectJ样式的加载时编织来支持仪表的{@code ClassLoader}。
+	 * 可能是当前的{@code ClassLoader}或由此{@link LoadTimeWeaver}实例创建的{@code ClassLoader}。
+	 * @return {@code ClassLoader}，它将根据注册的转换器公开检测类
+	 */
 	ClassLoader getInstrumentableClassLoader();
 
 	/**
@@ -57,6 +74,11 @@ public interface LoadTimeWeaver {
 	 * returned from an invocation of {@link #getInstrumentableClassLoader()}.
 	 * @return a temporary throwaway {@code ClassLoader}; should return
 	 * a new instance for each call, with no existing state
+	 */
+	/**
+	 * 返回一个废弃的{@code ClassLoader}，使类可以被加载和检查，而不会影响父类{@code ClassLoader}。
+	 * 应该不返回与{@link #getInstrumentableClassLoader（）}调用相同的{@link ClassLoader}实例。
+	 * @return 临时扔掉的{@code ClassLoader}；应该为每个调用返回一个新实例，没有现有状态\
 	 */
 	ClassLoader getThrowawayClassLoader();
 
