@@ -35,6 +35,14 @@ import org.springframework.lang.Nullable;
  * @since 2.0.3
  * @see InstantiationAwareBeanPostProcessorAdapter
  */
+
+/**
+ * {@link InstantiationAwareBeanPostProcessor}接口的扩展，添加了一个回调，用于预测已处理bean的最终类型。
+ * 注意：该接口是一个专用接口，主要供框架内部使用。
+ * 通常，应用程序提供的后处理器应仅实现简单的{@link BeanPostProcessor}接口或从{@link InstantiationAwareBeanPostProcessorAdapter}类派生。
+ * 即使在点发行版中，新方法也可能会添加到此接口。
+ * @see InstantiationAwareBeanPostProcessorAdapter
+ */
 public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessor {
 
 	/**
@@ -45,6 +53,14 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	 * @param beanName the name of the bean
 	 * @return the type of the bean, or {@code null} if not predictable
 	 * @throws org.springframework.beans.BeansException in case of errors
+	 */
+	/**
+	 * 预测最终从此处理器的{@link #postProcessBeforeInstantiation}回调返回的bean的类型。
+	 * 默认实现返回{@code null}。
+	 * @param beanClass bean的原始类
+	 * @param beanName bean的名称
+	 * @return bean的类型，或者{@code null}（如果不可预测的话）
+	 * @throws org.springframework.beans.BeansException错误
 	 */
 	@Nullable
 	default Class<?> predictBeanType(Class<?> beanClass, String beanName) throws BeansException {
@@ -94,6 +110,18 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	 * @return the object to expose as bean reference
 	 * (typically with the passed-in bean instance as default)
 	 * @throws org.springframework.beans.BeansException in case of errors
+	 */
+	/**
+	 * 获取用于早期访问指定bean的引用，通常是为了解决循环参考。
+	 * 此回调使后处理器有机会及早公开包装器-即在目标Bean实例完全初始化之前。
+	 * 公开的对象应等效于{@link #postProcessBeforeInitialization} / {@link #postProcessAfterInitialization}否则将公开的对象。
+	 * 注意，除非后处理器返回与所述后处理回调不同的包装器，否则此方法返回的对象将用作Bean引用。
+	 * 换句话说：这些后期处理回调可能最终会公开相同的引用，或者从这些后续回调返回原始bean实例（如果受影响的bean的包装器已经为调用此方法而构建，默认情况下，它将作为最终bean引用公开）。
+	 * 默认实现按原样返回给定的{@code bean}。
+	 * @param bean 原始bean实例
+	 * @param beanName bean的名称
+	 * @return 要公开为bean引用的对象（通常将传入的bean实例作为默认值）
+	 * @throws org.springframework.beans.BeansException如果有错误
 	 */
 	default Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
 		return bean;
