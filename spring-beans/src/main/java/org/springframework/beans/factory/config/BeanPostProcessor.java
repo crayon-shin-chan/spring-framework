@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.config;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.lang.Nullable;
 
 /**
@@ -55,6 +56,19 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
+/**
+ * 工厂钩子允许自定义修改新bean实例,例如，检查标记接口或使用代理包装bean。
+ * 通常，通过标记接口或类似对象填充bean的后处理器将实现{@link #postProcessBeforeInitialization}，而使用代理包装bean的后处理器通常将实现{@link #postProcessAfterInitialization}。
+ * 注册{@code ApplicationContext}可以在其bean定义中自动检测{@code BeanPostProcessor}bean，并将这些后处理器应用于随后创建的任何bean。
+ * 普通的{@code BeanFactory}允许以编程方式注册后处理器，并将其应用于通过bean工厂创建的所有bean。
+ * Ordering{@code ApplicationContext}中自动检测到的{@code BeanPostProcessor}bean将根据{@link org.springframework.core.PriorityOrdered}和{@link org.springframework.core.Ordered}语义。
+ * 相比之下，将以注册顺序应用通过{code BeanFactory}以编程方式注册的{@code BeanPostProcessor}bean；通过程序注册的后处理器将忽略通过实现{@code PriorityOrdered}或{@code Ordered}接口表示的任何排序语义。
+ * 此外，对于{@code BeanPostProcessor}bean，不考虑{@link org.springframework.core.annotation.Order}批注。
+ * @see InstantiationAwareBeanPostProcessor
+ * @see DestructionAwareBeanPostProcessor
+ * @see ConfigurableBeanFactory＃addBeanPostProcessor
+ * @see BeanFactoryPostProcessor
+ */
 public interface BeanPostProcessor {
 
 	/**
@@ -69,6 +83,16 @@ public interface BeanPostProcessor {
 	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 */
+	/**
+	 * 在任何bean初始化回调，如{@link InitializingBean#afterPropertiesSet()}或自定义的init-method）之前，将此{@code BeanPostProcessor}应用于给定的新bean实例。
+	 * 该bean将已经用属性值填充。返回的bean实例可能是原始包装。
+	 * 默认实现按原样返回给定的{@code bean}。
+	 * @param bean 是新的bean实
+	 * @param beanName bean的名称
+	 * @return 要使用的bean实例，无论是原始实例还是包装实例；如果{@code null}，则不会调用任何后续的BeanPostProcessor
+	 * @throws BeansException 如果发生错误，则@throws org.springframework.beans.BeansException
+	 * @see org.springframework.beans.factory.InitializingBean＃afterPropertiesSet
 	 */
 	@Nullable
 	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -94,6 +118,20 @@ public interface BeanPostProcessor {
 	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 * @see org.springframework.beans.factory.FactoryBean
+	 */
+	/**
+	 * 在任何bean初始化回调{@link InitializingBean#afterPropertiesSet()}或自定义的init-method）之后，将此{@code BeanPostProcessor}应用于给定的新bean实例。
+	 * 该bean将已经用属性值填充。返回的bean实例可能是原始实例的包装。
+	 * 对于FactoryBean，将同时为FactoryBean实例和由FactoryBean创建的对象（从Spring 2.0开始）调用此回调。
+	 * 后处理器可以通过相应的{@code bean instanceof FactoryBean}检查来决定是应用到FactoryBean还是创建的对象，还是两者都应用。
+	 * 与所有其他{@code BeanPostProcessor}回调相比，此回调还将在通过{@link InstantiationAwareBeanPostProcessor＃postProcessBeforeInstantiation}方法触发的短路后被调用。
+	 * 默认实现按原样返回给定的{@code bean}。
+	 * @param bean 是新的bean实例
+	 * @param beanName bean的名称
+	 * @return 要使用的bean实例，无论是原始实例还是包装实例；如果{@code null}，则不会调用后续的BeanPostProcessor
+	 * @throws BeansException 如果发生错误，则@throws org.springframework.beans.BeansException
+	 * @see org.springframework.beans.factory.InitializingBean＃afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */
 	@Nullable
