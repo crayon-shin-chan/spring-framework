@@ -28,6 +28,11 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
  * @since 2.5
  * @see org.springframework.context.ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME
  */
+
+/**
+ * 希望由通知应用程序上下文的默认{@link LoadTimeWeaver}的任何对象实现的接口。
+ * @see org.springframework.context.ConfigurableApplicationContext＃LOAD_TIME_WEAVER_BEAN_NAME
+ */
 public interface LoadTimeWeaverAware extends Aware {
 
 	/**
@@ -47,6 +52,16 @@ public interface LoadTimeWeaverAware extends Aware {
 	 * @param loadTimeWeaver the {@code LoadTimeWeaver} instance (never {@code null})
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext
+	 */
+	/**
+	 * 设置包含{@link org.springframework.context.ApplicationContext}的对象的{@link LoadTimeWeaver}。
+	 * 在填充正常的bean属性之后但在诸如{@link org.springframework.beans.factory.InitializingBean＃afterPropertiesSet（ ）}或自定义的初始化方法。
+	 * 在{@link org.springframework.context.ApplicationContextAware＃setApplicationContext}之后调用。
+	 * 注意：仅当应用程序上下文中确实存在{@code LoadTimeWeaver}时，才会调用此方法。
+	 * 如果不存在，则假定实现对象能够相应地激活其编织依赖性，则该方法将不会被调用。
+	 * @param loadTimeWeaver {@code LoadTimeWeaver}实例（永不{@code null}）
+	 * @see org.springframework.beans.factory.InitializingBean＃afterPropertiesSet
+	 * @see org.springframework.context.ApplicationContextAware＃setApplicationContext
 	 */
 	void setLoadTimeWeaver(LoadTimeWeaver loadTimeWeaver);
 
