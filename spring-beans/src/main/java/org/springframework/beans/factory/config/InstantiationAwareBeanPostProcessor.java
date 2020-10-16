@@ -112,7 +112,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * 默认实现返回{@code true}。
 	 * @param bean 创建的bean实例，尚未设置属性
 	 * @param beanName bean的名称
-	 * @return {@code true}（如果应在bean上设置属性）； {@code false} 如果应该跳过财产人口。正常的实现应返回{@code true}。
+	 * @return {@code true}（如果应在bean上设置属性）； {@code false} 如果应该跳过属性注入。正常的实现应返回{@code true}。
 	 * 返回{@code false}还将防止对此bean实例调用任何后续的InstantiationAwareBeanPostProcessor实例。
 	 * 如果发生错误，则抛出org.springframework.beans.BeansException *请参阅#postProcessBeforeInstantiation
 	 */
