@@ -1059,7 +1059,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
 
-		/** 尽早初始化LoadTimeWeaverAware Bean，以便尽早注册其转换器。 */
+		/** 尽早初始化{@link LoadTimeWeaverAware} Bean，以便尽早注册其转换器。 */
 		String[] weaverAwareNames = beanFactory.getBeanNamesForType(LoadTimeWeaverAware.class, false, false);
 		for (String weaverAwareName : weaverAwareNames) {
 			getBean(weaverAwareName);
