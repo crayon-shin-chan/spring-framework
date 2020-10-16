@@ -72,7 +72,6 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private AnnotatedElement qualifiedElement;
 
-	/** Determines if the definition needs to be re-merged. */
 	/* 确定是否需要重新合并定义。 */
 	volatile boolean stale;
 	/* 允许缓存 */
@@ -131,9 +130,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	final Object postProcessingLock = new Object();
 
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied. */
-	/**
-	 * 表示已应用合并的Bean定义PostProcessor。{@link MergedBeanDefinitionPostProcessor}
-	 */
+	/** 表示已应用合并的Bean定义PostProcessor。{@link MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition(RootBeanDefinition, Class, String)} */
 	boolean postProcessed = false;
 
 	/** 程序包可见的字段，指示已启动实例化前的后处理器。
@@ -404,6 +401,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	 * @return one or more preferred constructors, or {@code null} if none
 	 * (in which case the regular no-arg default constructor will be called)
 	 * @since 5.1
+	 */
+	/**
+	 * 确定用于默认构造的首选构造函数（如果有）。
+	 * 如有必要，构造器参数将自动装配。
+	 * @return 一个或多个首选构造函数，如果没有则返回{@code null} （在这种情况下，将调用常规的无参数默认构造函数）
 	 */
 	@Nullable
 	public Constructor<?>[] getPreferredConstructors() {
