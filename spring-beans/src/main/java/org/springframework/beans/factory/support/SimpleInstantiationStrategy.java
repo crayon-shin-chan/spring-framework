@@ -61,15 +61,23 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
 
 
+	/**
+	 * 在此工厂中以给定名称返回Bean的实例。
+	 * @param bd bean定义
+	 * @param beanName 在此上下文中创建bean时的名称。 如果我们正在自动装配不属于工厂的bean，则名称可以为{@code null}。
+	 * @param owner 所属的BeanFactory
+	 * @return 此bean定义的bean实例
+	 * @throws BeansException 如果实例化尝试失败，则抛出BeansException
+	 */
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
-		// 如果没有覆盖，请不要使用CGLIB覆盖该类。
 		/* 没有方法覆盖，则不需要使用CGLIB */
 		if (!bd.hasMethodOverrides()) {
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
 				/* 已解析构造函数或工厂方法 */
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
+				/* 使用构造函数为空 */
 				if (constructorToUse == null) {
 					final Class<?> clazz = bd.getBeanClass();
 					/* 接口没有构造函数 */
@@ -78,8 +86,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 					try {
 						if (System.getSecurityManager() != null) {
-							constructorToUse = AccessController.doPrivileged(
-									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
+							constructorToUse = AccessController.doPrivileged((PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
 							/* 获取bean类型声明的构造函数 */
@@ -97,7 +104,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
-			// 如果有方法覆盖，必须生成CGLIB子类
+			/* 如果有方法覆盖，必须生成CGLIB子类 */
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
 	}
