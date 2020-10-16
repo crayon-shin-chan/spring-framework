@@ -204,7 +204,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private Boolean lazyInit;
 	/* 自动装配模式 */
 	private int autowireMode = AUTOWIRE_NO;
-	/* 依赖检查模式 */
+	/* 依赖检查模式，默认不进行依赖检查 */
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 	/* 依赖bean名称数组 */
 	@Nullable
@@ -1253,7 +1253,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @throws BeanDefinitionValidationException 如果验证失败，则抛出BeanDefinitionValidationException
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
-		// Check that lookup methods exist and determine their overloaded status.
+		/* 检查查找方法是否存在，并确定其重载状态。 */
 		if (hasMethodOverrides()) {
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}
@@ -1276,12 +1276,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		/* 获取指定覆盖方法的数量 */
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
-			throw new BeanDefinitionValidationException(
-					"Invalid method override: no method with name '" + mo.getMethodName() +
-					"' on class [" + getBeanClassName() + "]");
+			throw new BeanDefinitionValidationException("Invalid method override: no method with name '" + mo.getMethodName() + "' on class [" + getBeanClassName() + "]");
 		}
 		else if (count == 1) {
-			// Mark override as not overloaded, to avoid the overhead of arg type checking.
 			/* 将替代标记为未过载，以避免arg类型检查的开销。 */
 			mo.setOverloaded(false);
 		}
